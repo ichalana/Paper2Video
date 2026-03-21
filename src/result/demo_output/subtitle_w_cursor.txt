@@ -1,0 +1,71 @@
+Good morning, everyone. | no
+Welcome to our presentation on "Paper2Video: Automatic Video Generation from Scientific Papers." | Paper2Video: Automatic Video Generation from Scientific Papers
+I'm Ziyu Zhu from the Show Lab at the National University of Singapore. | Ziyu Zhu*
+Our work introduces a novel approach to automate academic video production. | no
+We are excited to share our findings today. | March 18, 2026
+###
+Today, I'll first discuss the motivation behind our work. | Motivation
+Academic presentation videos are crucial for research dissemination. | Academic presentation videos
+However, producing them is highly labor-intensive, involving significant effort. | Producing them is highly labor-intensive
+The core challenge lies in the complex, multi-modal nature of video generation. | Challenge
+We aim to automatically generate such videos from scientific papers. | automatically generate
+###
+To address this, we introduce the Paper2Video benchmark. | Paper2Video
+It comprises 101 research papers, each with author-created videos and metadata. | 101 research papers
+The dataset covers diverse AI conferences like ML, CV, and NLP. | ML, CV, NLP
+Figure 2 illustrates statistics, including paper topics, slide counts, and video lengths. | Figure 2: Statistics of Paper2Video
+We evaluate models using Meta Similarity and PresentArena metrics. | Evaluation Metrics
+###
+Our proposed system is named PaperTalker, an end-to-end agent. | PaperTalker Agent
+Figure 4 depicts the overall pipeline, from paper input to video output. | Figure 4: Overall pipeline of PaperTalker
+Key modules include the Slide Builder for generating LaTeX slides. | Slide Builder
+The Subtitle & Cursor Builder produces aligned subtitles and cursor movements. | Subtitle & Cursor Builder
+This integrated approach automates the entire video creation process. | Outputs
+###
+Let's delve into the Slide Builder and its layout refinement. | Method: Slide Builder / Layout Refinement
+We generate slides directly from paper's LaTeX source. | Slides
+Compiler feedback is used to iteratively fix layout and content issues. | compiler feedback
+Our Tree Search Visual Choice is a novel technique for fine-grained layout optimization. | Tree Search Visual Choice
+Figure 5 visually explains this process, selecting the best slide candidate. | Figure 5: Tree Search Visual Choice
+###
+Next, we detail the Subtitle, Cursor, and Talker Builders. | Method: Subtitle, Cursor & Talker Builders
+Subtitles are generated per slide using a VLM for content alignment. | Subtitles generated per slide using a VLM to align content.
+Visual Focus Prompts effectively direct the cursor to key content. | Visual Focus Prompts
+We employ UI-TARS for spatial and WhisperX for temporal alignment of the cursor. | UI-TARS for spatial grounding (position).
+This enhances audience guidance and accessibility significantly. | Benefit: Enhanced audience guidance and accessibility.
+###
+Regarding experimental settings, we compared against several baselines. | Experimental Settings
+These include end-to-end video generation models and multi-agent methods. | End-to-end video generation
+Human-created presentations served as a direct comparison point. | Human-created presentations
+Our evaluation utilized the Paper2Video benchmark dataset. | Paper2Video benchmark
+Experiments were run on NVIDIA RTX A6000 GPUs using Gemini-2.5-Flash and GPT-4.1. | LLM/VLMs
+###
+Now, let's look at our main experimental results. | Experimental Results: Main
+Table 1 summarizes the performance across various metrics. | Table 1: Main Evaluation Results
+PaperTalker significantly outperforms all baselines in automatic metrics. | PaperTalker outperforms
+Crucially, our system achieves scores comparable to HumanMade content. | Comparable to HumanMade
+The human evaluation also confirms our generated videos' high quality. | Human Evaluation
+###
+We also conducted an ablation study and analyzed efficiency. | Experimental Results: Efficiency & Ablation
+Table 2 shows the generation cost for each method. | Table 2: Generation cost for each method.
+Cursor Highlight markedly improves content localization and QA accuracy. | Cursor Highlight
+Slide quality is significantly improved by our tree search refinement. | Slide quality
+PaperTalker is 2.5 times faster than PresentAgent, highlighting efficiency. | Speed vs. PresentAgent
+###
+This slide presents a visual comparison of generated videos. | Visualization Comparison
+Figure 8 compares PaperTalker against human-made, Veo3, and PresentAgent outputs. | Figure 8: Comparison with baselines
+PaperTalker produces rich content with accurate cursor grounding. | PaperTalker
+Unlike baselines, our videos feature an engaging talker and superior slide quality. | Talker Cursor
+This visualization clearly demonstrates our approach's effectiveness. | no
+###
+Finally, I'll discuss limitations and outline future work. | Limitations and Future Work
+Long-document parsing remains a challenge for extremely complex papers. | Long-document parsing
+Accurately explaining highly technical equations is also difficult. | Highly technical equations
+Future research includes enhanced semantic understanding for longer documents. | Enhanced semantic understanding
+We also plan to develop real-time interactive video agents. | real-time interactive video agents
+###
+Thank you for your attention to our presentation. | Thank You!
+We hope Paper2Video sparks further research in this exciting area. | no
+Questions and discussion are most welcome. | Questions and Discussion Welcome.
+Please feel free to reach out via email. | e1374425@nus.edu.sg
+no | no

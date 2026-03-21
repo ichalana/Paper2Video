@@ -50,5 +50,8 @@ def tts_per_slide(model_type, script_path, speech_save_dir, ref_audio, ref_text=
             if len(subtitle) == 0: subtitle = prompt
             else: subtitle = subtitle + "\n\n\n" + prompt
         speech_result_path = path.join(speech_save_dir, "{}.wav".format(str(slide_idx)))
+        if path.exists(speech_result_path):
+            print(f"Skipping slide {slide_idx}, audio already exists.")
+            continue
         if ref_text is None: ref_text = transcribe_with_whisperx(ref_audio)
         if model_type == "f5": inference_f5(subtitle, speech_result_path, ref_audio, ref_text)

@@ -1,5 +1,5 @@
 
-import whisper
+import whisperx as whisper
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from moviepy.editor import VideoFileClip, CompositeVideoClip, ImageClip
@@ -7,7 +7,7 @@ from moviepy.editor import VideoFileClip, CompositeVideoClip, ImageClip
 def create_subtitle_image(text, font_size=32, font_path="arial.ttf"):
     try:
         font = ImageFont.truetype(font_path, font_size)
-    except:
+    except Exception as e:
         print(f"[Warning] Failed to load font from '{font_path}': {e}")
         print("Using default font (fixed size, font_size will be ignored!)")
         font = ImageFont.load_default()
@@ -31,7 +31,7 @@ def create_subtitle_image(text, font_size=32, font_path="arial.ttf"):
 def generate_subtitle_clips(segments, video_w, video_h, font_size):
     clips = []
     for seg in segments:
-        img = create_subtitle_image(seg["text"], font_size=font_size, font_path="/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf")
+        img = create_subtitle_image(seg["text"], font_size=font_size, font_path="/System/Library/Fonts/Helvetica.ttc")
         img_array = np.array(img)
         clip = (ImageClip(img_array, ismask=False)
                 .set_duration(seg["end"] - seg["start"])
@@ -42,7 +42,7 @@ def generate_subtitle_clips(segments, video_w, video_h, font_size):
 
 def add_subtitles(video_path, output_path, font_size):
     print("[Step 1] Transcribing with Whisper...")
-    model = whisper.load_model("base")
+    model = whisper.load_model("base", device="cpu", compute_type="int8")
     result = model.transcribe(video_path, language="en")
     segments = result["segments"]
 

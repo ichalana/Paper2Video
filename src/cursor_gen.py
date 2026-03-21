@@ -3,17 +3,14 @@ import os
 import cv2
 import pdb
 import json
-import torch
 import string
 import subprocess
 from os import path
-import multiprocessing as mp
-from transformers import pipeline
-from ui_tars.action_parser import parse_action_to_structure_output, parsing_response_to_pyautogui_code
+from PIL import Image
+from camel.models import ModelFactory
+from camel.agents import ChatAgent
+from camel.messages import BaseMessage
 
-import whisperx
-from whisperx import load_audio
-from whisperx.alignment import align
 
 
 def draw_red_dots_on_image(image_path, point, radius: int = 5) -> None:
@@ -40,49 +37,43 @@ def parse_script(script_text):
         result.append(page_data)
     return result
 
-def infer_cursor(instruction, image_path, device):
-    pipe = pipeline("image-text-to-text", model="ByteDance-Seed/UI-TARS-1.5-7B")#, device=device)
-    print("running on {}".format(device))
-    prompt = "You are a GUI agent. You are given a task and your action history, with screenshots. You must to perform the next action to complete the task. \n\n## Output Format\n\nAction: ...\n\n\n## Action Space\nclick(point='<point>x1 y1</point>'')\n\n## User Instruction {}".format(instruction)
-    messages = [{"role": "user", "content": [{"type": "image", "url": image_path}, {"type": "text", "text": prompt}]},]
-    result = pipe(text=messages)[0]
-    response = result['generated_text'][1]["content"]
-    token = prompt + response
-    print("kkk", pipe(text=messages))
-    
+def infer_cursor_gemini(instruction, image_path, agent):
+    """Use Gemini VLM to find cursor position for the given instruction in the slide image."""
+    import time
     ori_image = cv2.imread(image_path)
-    original_image_width, original_image_height = ori_image.shape[:2]
-    parsed_dict = parse_action_to_structure_output(
-        response,
-        factor=1000,
-        origin_resized_height=original_image_height,
-        origin_resized_width=original_image_width,
-        model_type="qwen25vl"
-    )
-    parsed_pyautogui_code = parsing_response_to_pyautogui_code(
-        responses=parsed_dict,
-        image_height=original_image_height,
-        image_width=original_image_width)
+    orig_h, orig_w = ori_image.shape[:2]
 
-    match = re.search(r'pyautogui\.click\(([\d.]+),\s*([\d.]+)', parsed_pyautogui_code)
-    if match:
-        x = float(match.group(1))
-        y = float(match.group(2))
-    else:
-        print(instruction)
-    return (x, y), token
-    
-def infer(args):
-    slide_idx, sentence_idx, prompt, cursor_prompt, image_path, gpu_id = args
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
-    
-    import torch  
-    torch.cuda.set_device(0) 
-    
-    point, token = infer_cursor(cursor_prompt, image_path, device="cuda:{}".format(str(gpu_id)))
-    torch.cuda.empty_cache()
-    result = {'slide': slide_idx, 'sentence': sentence_idx, 'speech_text': prompt, 'cursor_prompt': cursor_prompt, 'cursor': point, 'token': token}
-    return result
+    pil_image = Image.open(image_path)
+    prompt = (
+        f"This is a presentation slide (size: {orig_w}x{orig_h} pixels). "
+        f"Find the location of '{instruction}' in the slide. "
+        f"Respond with only pixel coordinates in this exact format: click(x, y) "
+        f"where x is the horizontal pixel (0 to {orig_w}) and y is the vertical pixel (0 to {orig_h})."
+    )
+    message = BaseMessage.make_user_message(
+        role_name="user", content=prompt, image_list=[pil_image], meta_dict={}
+    )
+
+    for attempt in range(10):
+        try:
+            response = agent.step(message)
+            text = response.msg.content.strip()
+            token = prompt + text
+            match = re.search(r'click\(\s*([\d.]+)\s*,\s*([\d.]+)\s*\)', text)
+            if match:
+                x = max(0.0, min(float(match.group(1)), float(orig_w)))
+                y = max(0.0, min(float(match.group(2)), float(orig_h)))
+            else:
+                print(f"Could not parse cursor from: {text!r}, using center")
+                x, y = float(orig_w // 2), float(orig_h // 2)
+            return (x, y), token
+        except Exception as e:
+            wait = 45
+            print(f"Rate limit hit (attempt {attempt+1}/10), waiting {wait}s...")
+            time.sleep(wait)
+
+    print(f"All retries exhausted for '{instruction}', using center")
+    return (float(orig_w // 2), float(orig_h // 2)), ""
 
 def clean_text(text):
     text = text.lower()
@@ -121,74 +112,77 @@ def timesteps(subtitles, aligned_result, audio_path):
     result[-1]["end"] = get_audio_length(audio_path)
     return result
 
-def cursor_gen_per_sentence(script_path, slide_img_dir, slide_audio_dir, cursor_save_path, gpu_list):
+def cursor_gen_per_sentence(script_path, slide_img_dir, slide_audio_dir, cursor_save_path, gpu_list, model_name="gemini-2.5-flash"):
     with open(script_path, 'r') as f:script_with_cursor = ''.join(f.readlines())
     parsed_speech = parse_script(script_with_cursor)
     cursor_token = ""
-    
+
     slide_imgs = [name for name in os.listdir(slide_img_dir)]
     slide_imgs = sorted(slide_imgs, key=lambda x: int(re.search(r'\d+', x).group()))
     slide_imgs = [path.join(slide_img_dir, name) for name in slide_imgs]
-    
-    ## location
-    num_gpus = len(gpu_list)
-    process_idx = 0
-    task_list = []
+
+    ## use VLM API for cursor localization (fast API call, no local model needed)
+    from wei_utils import get_agent_config
+    agent_config = get_agent_config(model_name)
+    model = ModelFactory.create(
+        model_platform=agent_config["model_platform"],
+        model_type=agent_config["model_type"],
+        model_config_dict=agent_config.get("model_config"),
+        url=agent_config.get("url", None),
+    )
+    vlm_agent = ChatAgent(model=model, system_message="You are a helpful assistant that identifies locations of elements in presentation slides.")
+
+    cursor_result = []
     for slide_idx in range(len(parsed_speech)):
         speech_with_cursor = parsed_speech[slide_idx]
         image_path = slide_imgs[slide_idx]
+        slide_img = cv2.imread(image_path)
+        slide_h_img, slide_w_img = slide_img.shape[:2]
         for sentence_idx, (prompt, cursor_prompt) in enumerate(speech_with_cursor):
-            gpu_id = gpu_list[process_idx % num_gpus]
-            task_list.append((slide_idx, sentence_idx, prompt, cursor_prompt, image_path, gpu_id))
-            process_idx += 1  
-    
-    ctx = mp.get_context("spawn")
-    with ctx.Pool(processes=num_gpus) as pool: cursor_result = pool.map(infer, task_list)
-    
-    slide_w, slide_h = cv2.imread(slide_imgs[0]).shape[:2]
+            if cursor_prompt.strip().lower() == "no":
+                print(f"Skipping cursor for slide {slide_idx}, sentence {sentence_idx} (no cursor)")
+                point = (slide_w_img // 2, slide_h_img // 2)
+                token = ""
+            else:
+                print(f"Inferring cursor ({model_name}): slide {slide_idx}, sentence {sentence_idx} — '{cursor_prompt}'")
+                point, token = infer_cursor_gemini(cursor_prompt, image_path, vlm_agent)
+            cursor_result.append({'slide': slide_idx, 'sentence': sentence_idx, 'speech_text': prompt,
+                                   'cursor_prompt': cursor_prompt, 'cursor': point, 'token': token})
+
     for index in range(len(cursor_result)):
-        if cursor_result[index]["cursor_prompt"] == "no":
-            cursor_result[index]["cursor"] == (slide_w//2, slide_h//2)
         cursor_token += cursor_result[index]["token"]
-          
-    ## timesteps
-    slide_sentence_timesteps = []
+
+    ## timesteps: use WAV duration + word-count proportion (avoids slow WhisperX on CPU)
+    import wave as wave_mod
     slide_audio = os.listdir(slide_audio_dir)
     slide_audio = sorted(slide_audio, key=lambda x: int(re.search(r'\d+', x).group()))
     slide_audio = [path.join(slide_audio_dir, name) for name in slide_audio]
-    model = whisperx.load_model("large-v3", device="cuda")
-    align_model, metadata = whisperx.load_align_model(language_code="en", device="cuda")
-    
-    for idx, slide_audio_path in enumerate(slide_audio):
-        ## get slide subtitle
-        subtitle = []
-        cursor = []
-        for info in cursor_result: 
-            if info["slide"] == idx: 
-                subtitle.append(clean_text(info["speech_text"]))
-                cursor.append(info["cursor"])
-        ## word timesteps  
-        audio = load_audio(slide_audio_path)
-        result = model.transcribe(slide_audio_path, language="en")
-        aligned = align(transcript=result["segments"], align_model_metadata=metadata, model=align_model, audio=audio, device="cuda")
-        sentence_timesteps = timesteps(subtitle, aligned, slide_audio_path) # get_sentence_timesteps(subtitle, aligned, slide_audio_path)
-        for idx in range(len(sentence_timesteps)): sentence_timesteps[idx]["cursor"] = cursor[idx]
-        slide_sentence_timesteps.append(sentence_timesteps)
-    # merage
-    start_time_now = 0
-    new_slide_sentence_timesteps = []
-    for sentence_timesteps in slide_sentence_timesteps:
-        duration = 0
-        for idx in range(len(sentence_timesteps)):
-            if sentence_timesteps[idx]["start"] is None: sentence_timesteps[idx]["start"] = sentence_timesteps[idx-1]["end"]
-            if sentence_timesteps[idx]["end"] is None: sentence_timesteps[idx]["end"] = sentence_timesteps[idx+1]["start"]
 
-        for idx in range(len(sentence_timesteps)):
-            sentence_timesteps[idx]["start"] += start_time_now
-            sentence_timesteps[idx]["end"] += start_time_now
-            duration += sentence_timesteps[idx]["end"] - sentence_timesteps[idx]["start"]
-        start_time_now += duration
-        new_slide_sentence_timesteps.extend(sentence_timesteps)
+    def wav_duration(wav_path):
+        with wave_mod.open(wav_path, 'rb') as wf:
+            return wf.getnframes() / wf.getframerate()
+
+    global_time = 0.0
+    new_slide_sentence_timesteps = []
+    for idx, slide_audio_path in enumerate(slide_audio):
+        dur = wav_duration(slide_audio_path)
+        sentences_this_slide = [info for info in cursor_result if info["slide"] == idx]
+        if not sentences_this_slide:
+            global_time += dur
+            continue
+        total_words = sum(max(1, len(re.findall(r'\w+', info["speech_text"]))) for info in sentences_this_slide)
+        slide_time = global_time
+        for info in sentences_this_slide:
+            wc = max(1, len(re.findall(r'\w+', info["speech_text"])))
+            seg = dur * wc / total_words
+            new_slide_sentence_timesteps.append({
+                "start": round(slide_time, 4),
+                "end": round(slide_time + seg, 4),
+                "text": info["speech_text"],
+                "cursor": list(info["cursor"]),
+            })
+            slide_time += seg
+        global_time += dur
     
     with open(cursor_save_path.replace(".json", "_mid.json"), 'w') as f: json.dump(cursor_result, f, indent=2)
     with open(cursor_save_path, 'w') as f: json.dump(new_slide_sentence_timesteps, f, indent=2)

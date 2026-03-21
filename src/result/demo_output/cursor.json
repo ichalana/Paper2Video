@@ -1,0 +1,533 @@
+[
+  {
+    "start": 0.0,
+    "end": 1.296,
+    "text": "Good morning, everyone.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 1.296,
+    "end": 6.4798,
+    "text": "Welcome to our presentation on \"Paper2Video: Automatic Video Generation from Scientific Papers.\"",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 6.4798,
+    "end": 12.5276,
+    "text": "I'm Ziyu Zhu from the Show Lab at the National University of Singapore.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 12.5276,
+    "end": 17.2794,
+    "text": "Our work introduces a novel approach to automate academic video production.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 17.2794,
+    "end": 20.7353,
+    "text": "We are excited to share our findings today.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 20.7353,
+    "end": 24.5355,
+    "text": "Today, I'll first discuss the motivation behind our work.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 24.5355,
+    "end": 27.5756,
+    "text": "Academic presentation videos are crucial for research dissemination.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 27.5756,
+    "end": 31.3757,
+    "text": "However, producing them is highly labor-intensive, involving significant effort.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 31.3757,
+    "end": 36.3159,
+    "text": "The core challenge lies in the complex, multi-modal nature of video generation.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 36.3159,
+    "end": 40.116,
+    "text": "We aim to automatically generate such videos from scientific papers.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 40.116,
+    "end": 44.0493,
+    "text": "To address this, we introduce the Paper2Video benchmark.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 44.0493,
+    "end": 49.9493,
+    "text": "It comprises 101 research papers, each with author-created videos and metadata.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 49.9493,
+    "end": 55.3577,
+    "text": "The dataset covers diverse AI conferences like ML, CV, and NLP.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 55.3577,
+    "end": 61.2577,
+    "text": "Figure 2 illustrates statistics, including paper topics, slide counts, and video lengths.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 61.2577,
+    "end": 65.6827,
+    "text": "We evaluate models using Meta Similarity and PresentArena metrics.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 65.6827,
+    "end": 70.5495,
+    "text": "Our proposed system is named PaperTalker, an end-to-end agent.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 70.5495,
+    "end": 75.8587,
+    "text": "Figure 4 depicts the overall pipeline, from paper input to video output.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 75.8587,
+    "end": 80.2831,
+    "text": "Key modules include the Slide Builder for generating LaTeX slides.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 80.2831,
+    "end": 84.7074,
+    "text": "The Subtitle & Cursor Builder produces aligned subtitles and cursor movements.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 84.7074,
+    "end": 88.6893,
+    "text": "This integrated approach automates the entire video creation process.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 88.6893,
+    "end": 93.1792,
+    "text": "Let's delve into the Slide Builder and its layout refinement.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 93.1792,
+    "end": 96.8527,
+    "text": "We generate slides directly from paper's LaTeX source.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 96.8527,
+    "end": 101.3425,
+    "text": "Compiler feedback is used to iteratively fix layout and content issues.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 101.3425,
+    "end": 107.0568,
+    "text": "Our Tree Search Visual Choice is a novel technique for fine-grained layout optimization.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 107.0568,
+    "end": 111.5467,
+    "text": "Figure 5 visually explains this process, selecting the best slide candidate.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 111.5467,
+    "end": 115.618,
+    "text": "Next, we detail the Subtitle, Cursor, and Talker Builders.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 115.618,
+    "end": 120.594,
+    "text": "Subtitles are generated per slide using a VLM for content alignment.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 120.594,
+    "end": 125.1176,
+    "text": "Visual Focus Prompts effectively direct the cursor to key content.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 125.1176,
+    "end": 131.4508,
+    "text": "We employ UI-TARS for spatial and WhisperX for temporal alignment of the cursor.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 131.4508,
+    "end": 134.6173,
+    "text": "This enhances audience guidance and accessibility significantly.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 134.6173,
+    "end": 137.9806,
+    "text": "Regarding experimental settings, we compared against several baselines.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 137.9806,
+    "end": 143.0254,
+    "text": "These include end-to-end video generation models and multi-agent methods.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 143.0254,
+    "end": 146.809,
+    "text": "Human-created presentations served as a direct comparison point.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 146.809,
+    "end": 149.7518,
+    "text": "Our evaluation utilized the Paper2Video benchmark dataset.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 149.7518,
+    "end": 156.8987,
+    "text": "Experiments were run on NVIDIA RTX A6000 GPUs using Gemini-2.5-Flash and GPT-4.1.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 156.8987,
+    "end": 161.9384,
+    "text": "Now, let's look at our main experimental results.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 161.9384,
+    "end": 166.4182,
+    "text": "Table 1 summarizes the performance across various metrics.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 166.4182,
+    "end": 170.8979,
+    "text": "PaperTalker significantly outperforms all baselines in automatic metrics.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 170.8979,
+    "end": 175.9376,
+    "text": "Crucially, our system achieves scores comparable to HumanMade content.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 175.9376,
+    "end": 181.5373,
+    "text": "The human evaluation also confirms our generated videos' high quality.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 181.5373,
+    "end": 186.7333,
+    "text": "We also conducted an ablation study and analyzed efficiency.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 186.7333,
+    "end": 191.9293,
+    "text": "Table 2 shows the generation cost for each method.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 191.9293,
+    "end": 197.1253,
+    "text": "Cursor Highlight markedly improves content localization and QA accuracy.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 197.1253,
+    "end": 202.8987,
+    "text": "Slide quality is significantly improved by our tree search refinement.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 202.8987,
+    "end": 208.672,
+    "text": "PaperTalker is 2.5 times faster than PresentAgent, highlighting efficiency.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 208.672,
+    "end": 213.4398,
+    "text": "This slide presents a visual comparison of generated videos.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 213.4398,
+    "end": 219.267,
+    "text": "Figure 8 compares PaperTalker against human-made, Veo3, and PresentAgent outputs.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 219.267,
+    "end": 223.505,
+    "text": "PaperTalker produces rich content with accurate cursor grounding.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 223.505,
+    "end": 229.862,
+    "text": "Unlike baselines, our videos feature an engaging talker and superior slide quality.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 229.862,
+    "end": 234.1,
+    "text": "This visualization clearly demonstrates our approach's effectiveness.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 234.1,
+    "end": 239.2231,
+    "text": "Finally, I'll discuss limitations and outline future work.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 239.2231,
+    "end": 244.9154,
+    "text": "Long-document parsing remains a challenge for extremely complex papers.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 244.9154,
+    "end": 249.4693,
+    "text": "Accurately explaining highly technical equations is also difficult.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 249.4693,
+    "end": 254.5923,
+    "text": "Future research includes enhanced semantic understanding for longer documents.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 254.5923,
+    "end": 260.2847,
+    "text": "We also plan to develop real-time interactive video agents.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 260.2847,
+    "end": 264.1645,
+    "text": "Thank you for your attention to our presentation.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 264.1645,
+    "end": 269.0143,
+    "text": "We hope Paper2Video sparks further research in this exciting area.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 269.0143,
+    "end": 271.9242,
+    "text": "Questions and discussion are most welcome.",
+    "cursor": [
+      1008,
+      756
+    ]
+  },
+  {
+    "start": 271.9242,
+    "end": 275.804,
+    "text": "Please feel free to reach out via email.",
+    "cursor": [
+      1008,
+      756
+    ]
+  }
+]

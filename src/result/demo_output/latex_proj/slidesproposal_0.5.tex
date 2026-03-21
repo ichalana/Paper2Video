@@ -1,0 +1,57 @@
+\documentclass{beamer}
+
+
+% Use a modern academic theme (e.g., metropolis)
+\usetheme{metropolis}
+\usecolortheme{default}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{bm}
+\usepackage{multirow}
+\usepackage{subcaption} % For side-by-side figures
+
+% For highlighting
+\newcommand{\alertterm}[1]{\alert{\textbf{#1}}}
+
+% fix: \bench undefined; define it as 'Paper2Video'
+\newcommand{\bench}{Paper2Video}
+
+% fix: \Letter undefined for presenter mark
+\usepackage{textcomp}
+\newcommand{\Letter}{\textsuperscript{\texttildelow}}
+
+% Title and author information
+% Removed '&' from title to prevent error "Misplaced alignment tab character &"
+\title[Paper2Video]{\includegraphics[height=0.6cm]{figure/logo_.png} Paper2Video: Automatic Video Generation from Scientific Papers}
+\author[Zeyu Zhu, Kevin Q. Lin, Mike Z. Shou]{
+  Zeyu Zhu\textsuperscript{*}, Kevin Qinghong Lin\textsuperscript{*}, Mike Zheng Shou\Letter \\
+  {\small Show Lab, National University of Singapore}
+}
+\date{\today}
+
+% Adjust caption font size for better readability in slides
+\setbeamerfont{caption}{size=\scriptsize}
+
+
+\setbeamerfont{caption}{size=\scriptsize}
+\begin{document}
+\begin{frame}{Visualization Comparison}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.475\linewidth]{figure/vis.pdf}
+    \vspace{-1\baselineskip}
+    \caption{\textbf{Comparison with baselines.} PaperTalker produces slides with rich content, accurate cursor grounding, and an engaging talker, outperforming Veo3 (blurred text, incomplete coverage) and PresentAgent (text-heavy, layout issues, inaccurate info).}
+    \label{fig:vis_compare}
+  \end{figure}
+  \vspace{0.2cm}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.475\linewidth]{figure/tree_search_vis.pdf}
+    \vspace{-1\baselineskip}
+    \caption{\textbf{Effectiveness of Tree Search Visual Choice.} The second row shows slides after refinement, resolving overfull issues from the first row.}
+    \label{fig:tree_search_vis_compare}
+  \end{figure}
+\end{frame}
+\end{document}

@@ -20,7 +20,6 @@ from pdf2image import convert_from_path
 
 from speech_gen import tts_per_slide
 from subtitle_render import add_subtitles
-from talking_gen import talking_gen_per_slide
 from cursor_gen import cursor_gen_per_sentence
 # from slide_code_gen import latex_code_gen
 from slide_code_gen_select_improvement import latex_code_gen_upgrade
@@ -45,7 +44,6 @@ if __name__ == '__main__':
     parser.add_argument('--result_dir', type=str, default='./result/zeyu')
     parser.add_argument('--model_name_t', type=str, default='gpt-4.1') 
     parser.add_argument('--model_name_v', type=str, default='gpt-4.1') 
-    parser.add_argument('--model_name_talking', type=str, default='hallo2')
     parser.add_argument('--paper_latex_root', type=str, default='./assets/demo/latex_proj')
     parser.add_argument('--ref_img', type=str, default='./assets/demo/zeyu.png')
     parser.add_argument('--ref_audio', type=str, default='./assets/demo/zeyu.wav')
@@ -54,8 +52,7 @@ if __name__ == '__main__':
     parser.add_argument('--if_tree_search', type=bool, default=True)
     parser.add_argument('--beamer_templete_prompt', type=str, default=None)
     parser.add_argument('--stage', type=str, default="[\"0\"]") 
-    parser.add_argument('--talking_head_env', type=str, default="") 
-    # slide+subtitle: 1; 
+    # slide+subtitle: 1;
     # tts+cusor: 2; 
     # talking-head: 3: 
     # all: 0
@@ -139,49 +136,31 @@ if __name__ == '__main__':
         time_second["cursor_gen"] = [step3_2_time-step3_1_time]
         print("Cursor Generation", step3_2_time-step3_1_time)
     
-    ## Step 4: Talking Video Generation
+    ## Step 4: Merge
     start_time = time.time() # start time
     if "3" in stage or  "0" in stage:
-        talking_save_dir = path.join(args.result_dir, 'talking_{}'.format(args.model_name_talking))
-        talking_inference_input = []
-        audio_path_list = [path.join(speech_save_dir, name) for name in os.listdir(speech_save_dir)]
-        for audio_path in audio_path_list: talking_inference_input.append([args.ref_img, audio_path])
-        talking_gen_per_slide(args.model_name_talking, talking_inference_input, talking_save_dir, args.gpu_list, env_path=args.talking_head_env)
-        step4_time =  time.time()
-        time_second["talking_gen"] = [step4_time-start_time]
-        print("Cursor Generation", step4_time-start_time)
-    
-        ## Step5: Merage
-        # merage talking and slides
         tmp_merage_dir = path.join(args.result_dir, "merage")
         tmp_merage_1 = path.join(args.result_dir, "1_merage.mp4")
         image_size = cv2.imread(path.join(slide_image_dir, '1.png')).shape
-        if args.model_name_talking == 'hallo2':
-            size = max(image_size[0]//6, image_size[1]//6)
-            width, height = size, size
+        size = max(image_size[0]//6, image_size[1]//6)
         num_slide = len(os.listdir(slide_image_dir))
         print(args.ref_img.split("/")[-1].split(".")[0])
-        merage_cmd =  ["./1_merage.bash", slide_image_dir, talking_save_dir, tmp_merage_dir,
-                    str(width), str(height), str(num_slide), tmp_merage_1, args.ref_img.split("/")[-1].replace(".png", "")]
+        merage_cmd = ["./1_merage_light.bash", slide_image_dir, speech_save_dir, tmp_merage_dir,
+                      str(num_slide), tmp_merage_1, args.ref_img.split("/")[-1].replace(".png", "")]
         out = subprocess.run(merage_cmd, text=True)
         # render cursor
         cursor_size = size//6
         tmp_merage_2 = path.join(args.result_dir, "2_merage.mp4")
-        render_video_with_cursor_from_json(video_path=tmp_merage_1, out_video_path=tmp_merage_2, 
-                                        json_path=cursor_save_path, cursor_img_path=cursor_img_path, 
+        render_video_with_cursor_from_json(video_path=tmp_merage_1, out_video_path=tmp_merage_2,
+                                        json_path=cursor_save_path, cursor_img_path=cursor_img_path,
                                         transition_duration=0.1, cursor_size=cursor_size)
         # render subtitle
-        front_size = size//10
         tmp_merage_3 = path.join(args.result_dir, "3_merage.mp4")
         add_subtitles(tmp_merage_2, tmp_merage_3, size//10)
         step5_time =  time.time()
-        time_second["merage"] = [step5_time-step4_time]
-        print("Merage", step5_time-step4_time)
+        time_second["merage"] = [step5_time-start_time]
+        print("Merage", step5_time-start_time)
         
     # sat. save
-    time_second = {"slide_gen": [step1_time-start_time, usage_slide], 
-                   "subtitle_cursor_prompt_gen": [step2_time-step1_time, usage_subtitle],
-                   "tts": step3_1_time-step2_time, "cursor_gen": step3_2_time-step3_1_time, 
-                   "talking_gen": step4_time-step3_2_time, "merage": step5_time-step4_time}
     with open(path.join(args.result_dir, "sat.json"), 'w') as f: json.dump(time_second, f, indent=4)
     with open(path.join(args.result_dir, "token.json"), 'w') as f: json.dump(token_usage, f, indent=4)

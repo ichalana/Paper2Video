@@ -37,6 +37,8 @@ def copy_folder(src_dir, dst_dir):
     shutil.copytree(src_dir, dst_dir)
 
 def str2list(s):
+    if not s.strip():
+        return []
     return [int(x) for x in s.split(',')]
 
 if __name__ == '__main__':
@@ -48,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('--ref_img', type=str, default='./assets/demo/zeyu.png')
     parser.add_argument('--ref_audio', type=str, default='./assets/demo/zeyu.wav')
     parser.add_argument('--ref_text', type=str, default=None)
-    parser.add_argument('--gpu_list', type=str2list, default="")
+    parser.add_argument('--gpu_list', type=str2list, default=[])
     parser.add_argument('--if_tree_search', type=bool, default=True)
     parser.add_argument('--beamer_templete_prompt', type=str, default=None)
     parser.add_argument('--stage', type=str, default="[\"0\"]") 
@@ -111,15 +113,19 @@ if __name__ == '__main__':
 
     speech_save_dir = path.join(args.result_dir, 'audio')
     if "2" in stage or  "0" in stage:
-        prompt_path = "prompts/slide_subtitle_cursor_prompt.txt"
-        subtitle, usage_subtitle = subtitle_cursor_gen(slide_image_dir, prompt_path, agent_config_v)
-        with open(subtitle_cursor_save_path, 'w') as f: f.write(subtitle)
-        if args.model_name_v not in token_usage.keys(): 
-            token_usage[args.model_name_v] = [usage_subtitle]
-        else: token_usage[args.model_name_v].append(usage_subtitle)
-        step2_time =  time.time()
-        time_second["subtitle_cursor_prompt_gen"] = [step2_time-start_time]
-        print("Subtitle and Cursor Prompt Generation", step2_time-start_time)
+        if path.exists(subtitle_cursor_save_path):
+            print(f"Skipping subtitle gen, file already exists: {subtitle_cursor_save_path}")
+            step2_time = time.time()
+        else:
+            prompt_path = "prompts/slide_subtitle_cursor_prompt.txt"
+            subtitle, usage_subtitle = subtitle_cursor_gen(slide_image_dir, prompt_path, agent_config_v)
+            with open(subtitle_cursor_save_path, 'w') as f: f.write(subtitle)
+            if args.model_name_v not in token_usage.keys():
+                token_usage[args.model_name_v] = [usage_subtitle]
+            else: token_usage[args.model_name_v].append(usage_subtitle)
+            step2_time =  time.time()
+            time_second["subtitle_cursor_prompt_gen"] = [step2_time-start_time]
+            print("Subtitle and Cursor Prompt Generation", step2_time-start_time)
 
     
         ## Step 3-1: Speech Generation
@@ -131,13 +137,18 @@ if __name__ == '__main__':
         
         
         ## Step 3-2: Cursor Generation
-        os.environ["PYTHONHASHSEED"] = "random"        
-        cursor_token = cursor_gen_per_sentence(script_path=subtitle_cursor_save_path, slide_img_dir=slide_image_dir, 
-                                slide_audio_dir=speech_save_dir, cursor_save_path=cursor_save_path, gpu_list=args.gpu_list)
-        token_usage["cursor"] = cursor_token
-        step3_2_time =  time.time()
-        time_second["cursor_gen"] = [step3_2_time-step3_1_time]
-        print("Cursor Generation", step3_2_time-step3_1_time)
+        if path.exists(cursor_save_path):
+            print(f"Skipping cursor gen, file already exists: {cursor_save_path}")
+            step3_2_time = time.time()
+        else:
+            os.environ["PYTHONHASHSEED"] = "random"
+            cursor_token = cursor_gen_per_sentence(script_path=subtitle_cursor_save_path, slide_img_dir=slide_image_dir,
+                                    slide_audio_dir=speech_save_dir, cursor_save_path=cursor_save_path, gpu_list=args.gpu_list,
+                                    model_name=args.model_name_v)
+            token_usage["cursor"] = cursor_token
+            step3_2_time =  time.time()
+            time_second["cursor_gen"] = [step3_2_time-step3_1_time]
+            print("Cursor Generation", step3_2_time-step3_1_time)
     
     
     ## Step 4: Video Generation
