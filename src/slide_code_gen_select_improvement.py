@@ -35,6 +35,22 @@ def extract_beamer_code(tex_str):
     match = re.search(r"(\\documentclass(?:\[[^\]]*\])?\{beamer\}.*?\\end\{document\})", tex_str, re.DOTALL)
     return match.group(1) if match else None
 
+
+def _escape_unders_in_arg(s: str) -> str:
+    """Escape unescaped underscores inside a text-mode macro argument."""
+    return re.sub(r'(?<!\\)_', r'\\_', s)
+
+
+def sanitize_tex_text(code: str) -> str:
+    """
+    Escape underscores inside text-display macros where LaTeX would otherwise
+    treat `_` as a math-mode subscript. Leaves underscores in \\label, \\ref,
+    \\cite, \\includegraphics, etc. untouched.
+    """
+    text_macros = ['textbf', 'textit', 'emph', 'text', 'alert', 'underline', 'texttt']
+    pattern = re.compile(r'\\(' + '|'.join(text_macros) + r')\{([^{}]*)\}')
+    return pattern.sub(lambda m: f'\\{m.group(1)}{{{_escape_unders_in_arg(m.group(2))}}}', code)
+
 def latex_code_gen_upgrade(prompt_path, tex_dir, beamer_save_path, 
                            model_config_ll, model_config_vl,
                            beamer_temp_name=None, if_fix=True, if_tree_search=True):
@@ -72,9 +88,10 @@ def latex_code_gen_upgrade(prompt_path, tex_dir, beamer_save_path,
     
     code = extract_beamer_code(response.msgs[-1].content)
     if not isinstance(code, str): print("failed to generate code", response.msgs[-1].content)
+    code = sanitize_tex_text(code)
     with open(beamer_save_path, "w", encoding="utf-8") as f: f.write(code)
     feedback = compile_tex(beamer_save_path)
-    
+
     ## fix if error
     num_try = 0
     token_usage["fix"] = []
@@ -86,6 +103,7 @@ def latex_code_gen_upgrade(prompt_path, tex_dir, beamer_save_path,
             token_usage["fix"].append(fix_usage)
         else: break
         if not isinstance(code, str): print("failed to fix code") ## debug
+        code = sanitize_tex_text(code)
         with open(beamer_save_path, "w", encoding="utf-8") as f: f.write(code)
         feedback = compile_tex(beamer_save_path)
         num_try += 1
@@ -95,11 +113,24 @@ def latex_code_gen_upgrade(prompt_path, tex_dir, beamer_save_path,
     if if_tree_search is True:
         new_code_save_path, token_usage_improve = improve_layout(code, feedback, beamer_save_path, config)
         token_usage["improve"] = token_usage_improve
-        return token_usage, new_code_save_path
+        final_pdf = new_code_save_path
     else:
-        return token_usage, beamer_save_path.replace(".tex", ".pdf")
+        final_pdf = beamer_save_path.replace(".tex", ".pdf")
 
-select_proposal_prompt_path = "prompts/select_proposal.txt"
+    # Fail loudly if the PDF didn't actually compile — prevents downstream
+    # errors like PDFPageCountError in convert_from_path.
+    if not path.exists(final_pdf):
+        fallback_pdf = beamer_save_path.replace(".tex", ".pdf")
+        if path.exists(fallback_pdf):
+            print(f"[WARN] Refined PDF missing, falling back to {fallback_pdf}")
+            return token_usage, fallback_pdf
+        raise RuntimeError(
+            f"LaTeX compilation failed — no PDF produced at {final_pdf}. "
+            f"Check the tectonic output above for the underlying error."
+        )
+    return token_usage, final_pdf
+
+select_proposal_prompt_path = "./src/prompts/select_proposal.txt"
 def improve_layout(code, feedback, beamer_save_path, model_config):
     with open(select_proposal_prompt_path, 'r') as f: template_prompt = f.read()
     token_usage_improve = []
@@ -187,8 +218,9 @@ def improve_layout(code, feedback, beamer_save_path, model_config):
         new_code.append(add_small_after_blocks(frame["text"]))   
     new_code.append("\\end{document}")
     new_code = "\n".join(new_code)
+    new_code = sanitize_tex_text(new_code)
     new_code_save_path = beamer_save_path.replace(".tex", "_refined.tex")
-    with open(new_code_save_path, 'w') as f: f.write(new_code) 
+    with open(new_code_save_path, 'w') as f: f.write(new_code)
     feedback = compile_tex(new_code_save_path)
     return new_code_save_path.replace(".tex", ".pdf"), token_usage_improve
 
@@ -561,7 +593,7 @@ def compute_frame_spans(code: str):
     return frames
 
 ## fix the grammer error with complie error
-correct_prompt_path = "./prompts/slide_beamer_correct.txt"
+correct_prompt_path = "./src/prompts/slide_beamer_correct.txt"
 def correcte_error(beamer_code, error_info, agent):
     with open(correct_prompt_path, 'r', encoding='utf-8') as f_prompt: templete_prompt = f_prompt.read()
     inference_prompt = (

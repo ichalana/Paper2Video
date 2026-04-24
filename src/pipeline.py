@@ -15,6 +15,7 @@ import os, sys
 import argparse
 import subprocess
 from os import path
+from dotenv import load_dotenv
 from pdf2image import convert_from_path
 
 
@@ -29,8 +30,7 @@ from subtitle_cursor_prompt_gen import subtitle_cursor_gen
 from wei_utils import get_agent_config
 
 
-# os.environ["GEMINI_API_KEY"] = ""
-# os.environ["OPENAI_API_KEY"] = ""
+load_dotenv(dotenv_path=path.join(path.dirname(path.dirname(path.abspath(__file__))), '.env'))
 
 def copy_folder(src_dir, dst_dir):
     if not os.path.exists(src_dir): raise FileNotFoundError(f"no such dir: {src_dir}")
@@ -92,7 +92,7 @@ if __name__ == '__main__':
                                                             model_config_ll=agent_config_t, model_config_vl=agent_config_v, beamer_temp_name=args.beamer_templete_prompt)
         else:
             paper_latex_path = path.join(args.paper_latex_root, "main.tex") 
-            usage_slide = latex_code_gen(prompt_path=prompt_path, tex_dir=args.paper_latex_root, tex_path=paper_latex_path, beamer_save_path=slide_latex_path, model_config=agent_config_t)
+            usage_slide = latex_code_gen_upgrade(prompt_path=prompt_path, tex_dir=args.paper_latex_root, tex_path=paper_latex_path, beamer_save_path=slide_latex_path, model_config=agent_config_t)
             
         slide_imgs = convert_from_path(beamer_path, dpi=400)
         for i, img in enumerate(slide_imgs): img.save(path.join(slide_image_dir, f"{i+1}.png")) # save slides as images

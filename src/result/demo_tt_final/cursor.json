@@ -1,0 +1,209 @@
+[
+  {
+    "start": 0.0,
+    "end": 5.5633,
+    "text": "Today, I will present our work titled \"Detecting Safety Violations Across Many Agent Traces.\"",
+    "cursor": [
+      1010.0,
+      205.0
+    ]
+  },
+  {
+    "start": 5.5633,
+    "end": 11.9213,
+    "text": "This research was conducted by Adam Stein, Davis Brown, Hamed Hassani, Mayur Naik, and Eric Wong.",
+    "cursor": [
+      1010.0,
+      468.0
+    ]
+  },
+  {
+    "start": 11.9213,
+    "end": 18.6767,
+    "text": "We are with the University of Pennsylvania, and the presentation is based on our June 2026 preprint.",
+    "cursor": [
+      1010.0,
+      650.0
+    ]
+  },
+  {
+    "start": 18.6767,
+    "end": 25.6913,
+    "text": "AI safety auditing has traditionally focused on single agent traces, as shown in the first bullet.",
+    "cursor": [
+      531.0,
+      332.0
+    ]
+  },
+  {
+    "start": 25.6913,
+    "end": 30.0754,
+    "text": "However, in practical deployments, violations appear distributed across multiple traces.",
+    "cursor": [
+      662.0,
+      390.0
+    ]
+  },
+  {
+    "start": 30.0754,
+    "end": 36.6515,
+    "text": "Existing approaches often miss failures that require joint analysis, as indicated in the third point.",
+    "cursor": [
+      670.0,
+      449.0
+    ]
+  },
+  {
+    "start": 36.6515,
+    "end": 43.6661,
+    "text": "We face challenges such as rare failures, adversarial disguises, and scale, detailed in the challenge section.",
+    "cursor": [
+      346.0,
+      505.0
+    ]
+  },
+  {
+    "start": 43.6661,
+    "end": 48.4887,
+    "text": "These issues motivate new approaches for detecting cross-trace safety violations.",
+    "cursor": [
+      922.0,
+      701.0
+    ]
+  },
+  {
+    "start": 48.4887,
+    "end": 52.4509,
+    "text": "This slide illustrates a motivating example: distributed ransomware detection.",
+    "cursor": [
+      505.0,
+      104.0
+    ]
+  },
+  {
+    "start": 52.4509,
+    "end": 59.0547,
+    "text": "The figure shows how benign-looking traces, when combined, violate the safety property against ransomware.",
+    "cursor": [
+      1011.0,
+      391.0
+    ]
+  },
+  {
+    "start": 59.0547,
+    "end": 66.0987,
+    "text": "A small set of traces, called the violating witness set W, enables a successful ransomware attack.",
+    "cursor": [
+      495.0,
+      895.0
+    ]
+  },
+  {
+    "start": 66.0987,
+    "end": 71.0565,
+    "text": "Prior research includes single-trace monitoring for sabotage and deception detection.",
+    "cursor": [
+      538.0,
+      346.0
+    ]
+  },
+  {
+    "start": 71.0565,
+    "end": 75.1129,
+    "text": "Automated audits leverage red teaming and LLM-based evaluations.",
+    "cursor": [
+      547.0,
+      395.0
+    ]
+  },
+  {
+    "start": 75.1129,
+    "end": 80.5214,
+    "text": "Corpus-scale analysis enables human exploration and clustering of traces at scale.",
+    "cursor": [
+      557.0,
+      444.0
+    ]
+  },
+  {
+    "start": 80.5214,
+    "end": 87.282,
+    "text": "However, most methods miss hyperproperty violations and formal methods struggle at scale and with language.",
+    "cursor": [
+      665.0,
+      523.0
+    ]
+  },
+  {
+    "start": 87.282,
+    "end": 94.5875,
+    "text": "Our goal is to audit a repository of agent traces for violation of a natural-language property \u03c6.",
+    "cursor": [
+      766.0,
+      351.0
+    ]
+  },
+  {
+    "start": 94.5875,
+    "end": 99.8637,
+    "text": "Our method finds sets, or witnesses, of traces that collectively form a violation.",
+    "cursor": [
+      728.0,
+      433.0
+    ]
+  },
+  {
+    "start": 99.8637,
+    "end": 105.5458,
+    "text": "The process includes embedding traces, clustering them, constructing prompts, and searching for violating sets.",
+    "cursor": [
+      692.0,
+      527.0
+    ]
+  },
+  {
+    "start": 105.5458,
+    "end": 110.822,
+    "text": "This framework enables joint analysis to detect failures missed by per-trace monitoring.",
+    "cursor": [
+      701.0,
+      604.0
+    ]
+  },
+  {
+    "start": 110.822,
+    "end": 118.0082,
+    "text": "We define the setup with a repository R of traces and a forbidden safety property \u03c6 in natural language.",
+    "cursor": [
+      364.0,
+      357.0
+    ]
+  },
+  {
+    "start": 118.0082,
+    "end": 123.3032,
+    "text": "A cross-trace violation occurs if a subset W of traces jointly violates \u03c6.",
+    "cursor": [
+      485.0,
+      433.0
+    ]
+  },
+  {
+    "start": 123.3032,
+    "end": 128.2201,
+    "text": "The objective is to identify such witness sets or conclude no violation exists.",
+    "cursor": [
+      396.0,
+      480.0
+    ]
+  },
+  {
+    "start": 128.2201,
+    "end": 133.8933,
+    "text": "Key challenges include visibility only across traces, a majority of benign traces, and adversarial disguises.",
+    "cursor": [
+      253.0,
+      523.0
+    ]
+  }
+]

@@ -1,0 +1,200 @@
+[
+  {
+    "start": 0.0,
+    "end": 5.0544,
+    "text": "Welcome to our presentation on detecting safety violations across many agent traces.",
+    "cursor": [
+      1008.0,
+      150.0
+    ]
+  },
+  {
+    "start": 5.0544,
+    "end": 13.8996,
+    "text": "My name is Adam Stein, and I co-authored this work with my colleagues listed here at the University of Pennsylvania.",
+    "cursor": [
+      800.0,
+      360.0
+    ]
+  },
+  {
+    "start": 13.8996,
+    "end": 18.954,
+    "text": "This research is based on our recent arXiv preprint from June 2026.",
+    "cursor": [
+      1008.0,
+      620.0
+    ]
+  },
+  {
+    "start": 18.954,
+    "end": 24.9061,
+    "text": "Current AI safety auditing mostly examines individual agent traces for failures.",
+    "cursor": [
+      110.0,
+      230.0
+    ]
+  },
+  {
+    "start": 24.9061,
+    "end": 33.0227,
+    "text": "However, real-world violations often span multiple traces, revealing complex failure modes when analyzed collectively.",
+    "cursor": [
+      110.0,
+      280.0
+    ]
+  },
+  {
+    "start": 33.0227,
+    "end": 41.6804,
+    "text": "For example, ransomware attacks appear benign in single traces but reveal coordinated exfiltration patterns across many.",
+    "cursor": [
+      110.0,
+      335.0
+    ]
+  },
+  {
+    "start": 41.6804,
+    "end": 48.1736,
+    "text": "Challenges include rarity, adversarial disguise, and missed detection by per-trace monitors.",
+    "cursor": [
+      110.0,
+      385.0
+    ]
+  },
+  {
+    "start": 48.1736,
+    "end": 55.208,
+    "text": "Therefore, we need novel auditing approaches that identify violations across many traces simultaneously.",
+    "cursor": [
+      110.0,
+      465.0
+    ]
+  },
+  {
+    "start": 55.208,
+    "end": 60.6028,
+    "text": "This figure illustrates our motivating example with a Meerkat agentic search.",
+    "cursor": [
+      180.0,
+      700.0
+    ]
+  },
+  {
+    "start": 60.6028,
+    "end": 66.488,
+    "text": "Individual traces show safe actions such as recovery instructions and maintenance drafts.",
+    "cursor": [
+      300.0,
+      620.0
+    ]
+  },
+  {
+    "start": 66.488,
+    "end": 74.335,
+    "text": "However, subsets of these traces, when combined, reveal a coordinated ransomware attack pattern involving key exfiltration.",
+    "cursor": [
+      1700.0,
+      670.0
+    ]
+  },
+  {
+    "start": 74.335,
+    "end": 82.182,
+    "text": "This adversarial misuse is invisible per trace but evident cross-trace as a violating witness W.",
+    "cursor": [
+      320.0,
+      1260.0
+    ]
+  },
+  {
+    "start": 82.182,
+    "end": 88.5299,
+    "text": "Previous work includes trace-level monitoring for sabotage and deception, but with limitations.",
+    "cursor": [
+      120.0,
+      230.0
+    ]
+  },
+  {
+    "start": 88.5299,
+    "end": 93.9013,
+    "text": "Automated auditing through red teaming exists but often targets individual traces.",
+    "cursor": [
+      120.0,
+      270.0
+    ]
+  },
+  {
+    "start": 93.9013,
+    "end": 100.2492,
+    "text": "Corpus-scale analysis helps discovery but relies on human-in-the-loop methods.",
+    "cursor": [
+      120.0,
+      320.0
+    ]
+  },
+  {
+    "start": 100.2492,
+    "end": 106.5971,
+    "text": "Most methods miss complex hyperproperty failures across traces, a key limitation we address.",
+    "cursor": [
+      120.0,
+      370.0
+    ]
+  },
+  {
+    "start": 106.5971,
+    "end": 113.4333,
+    "text": "Formal methods and runtime verification do not scale well nor handle natural-language properties.",
+    "cursor": [
+      120.0,
+      415.0
+    ]
+  },
+  {
+    "start": 113.4333,
+    "end": 122.1209,
+    "text": "Our goal is to audit a repository of agent traces for safety violations specified by natural-language properties.",
+    "cursor": [
+      150.0,
+      270.0
+    ]
+  },
+  {
+    "start": 122.1209,
+    "end": 129.3605,
+    "text": "Traditional methods classify traces independently, but OurMethod searches for violating sets or witnesses of traces.",
+    "cursor": [
+      150.0,
+      320.0
+    ]
+  },
+  {
+    "start": 129.3605,
+    "end": 137.5654,
+    "text": "OurMethod involves embedding traces, clustering to reveal related groups, and building an agent prompt to combine these.",
+    "cursor": [
+      150.0,
+      320.0
+    ]
+  },
+  {
+    "start": 137.5654,
+    "end": 146.7356,
+    "text": "We then use an agent reasoning system to propose witnesses, score traces, and emit verdicts: PASS, FAIL, or INCONCLUSIVE.",
+    "cursor": [
+      150.0,
+      460.0
+    ]
+  },
+  {
+    "start": 146.7356,
+    "end": 152.0447,
+    "text": "This approach localizes and detects failures invisible to per-trace analysis.",
+    "cursor": [
+      150.0,
+      360.0
+    ]
+  }
+]

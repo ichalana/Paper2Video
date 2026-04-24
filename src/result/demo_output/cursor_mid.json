@@ -1,0 +1,662 @@
+[
+  {
+    "slide": 0,
+    "sentence": 0,
+    "speech_text": "Good morning, everyone.",
+    "cursor_prompt": "no",
+    "cursor": [
+      1008,
+      756
+    ],
+    "token": ""
+  },
+  {
+    "slide": 0,
+    "sentence": 1,
+    "speech_text": "Welcome to our presentation on \"Paper2Video: Automatic Video Generation from Scientific Papers.\"",
+    "cursor_prompt": "Paper2Video: Automatic Video Generation from Scientific Papers",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 0,
+    "sentence": 2,
+    "speech_text": "I'm Ziyu Zhu from the Show Lab at the National University of Singapore.",
+    "cursor_prompt": "Ziyu Zhu*",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 0,
+    "sentence": 3,
+    "speech_text": "Our work introduces a novel approach to automate academic video production.",
+    "cursor_prompt": "no",
+    "cursor": [
+      1008,
+      756
+    ],
+    "token": ""
+  },
+  {
+    "slide": 0,
+    "sentence": 4,
+    "speech_text": "We are excited to share our findings today.",
+    "cursor_prompt": "March 18, 2026",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 1,
+    "sentence": 0,
+    "speech_text": "Today, I'll first discuss the motivation behind our work.",
+    "cursor_prompt": "Motivation",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 1,
+    "sentence": 1,
+    "speech_text": "Academic presentation videos are crucial for research dissemination.",
+    "cursor_prompt": "Academic presentation videos",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 1,
+    "sentence": 2,
+    "speech_text": "However, producing them is highly labor-intensive, involving significant effort.",
+    "cursor_prompt": "Producing them is highly labor-intensive",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 1,
+    "sentence": 3,
+    "speech_text": "The core challenge lies in the complex, multi-modal nature of video generation.",
+    "cursor_prompt": "Challenge",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 1,
+    "sentence": 4,
+    "speech_text": "We aim to automatically generate such videos from scientific papers.",
+    "cursor_prompt": "automatically generate",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 2,
+    "sentence": 0,
+    "speech_text": "To address this, we introduce the Paper2Video benchmark.",
+    "cursor_prompt": "Paper2Video",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 2,
+    "sentence": 1,
+    "speech_text": "It comprises 101 research papers, each with author-created videos and metadata.",
+    "cursor_prompt": "101 research papers",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 2,
+    "sentence": 2,
+    "speech_text": "The dataset covers diverse AI conferences like ML, CV, and NLP.",
+    "cursor_prompt": "ML, CV, NLP",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 2,
+    "sentence": 3,
+    "speech_text": "Figure 2 illustrates statistics, including paper topics, slide counts, and video lengths.",
+    "cursor_prompt": "Figure 2: Statistics of Paper2Video",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 2,
+    "sentence": 4,
+    "speech_text": "We evaluate models using Meta Similarity and PresentArena metrics.",
+    "cursor_prompt": "Evaluation Metrics",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 3,
+    "sentence": 0,
+    "speech_text": "Our proposed system is named PaperTalker, an end-to-end agent.",
+    "cursor_prompt": "PaperTalker Agent",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 3,
+    "sentence": 1,
+    "speech_text": "Figure 4 depicts the overall pipeline, from paper input to video output.",
+    "cursor_prompt": "Figure 4: Overall pipeline of PaperTalker",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 3,
+    "sentence": 2,
+    "speech_text": "Key modules include the Slide Builder for generating LaTeX slides.",
+    "cursor_prompt": "Slide Builder",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 3,
+    "sentence": 3,
+    "speech_text": "The Subtitle & Cursor Builder produces aligned subtitles and cursor movements.",
+    "cursor_prompt": "Subtitle & Cursor Builder",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 3,
+    "sentence": 4,
+    "speech_text": "This integrated approach automates the entire video creation process.",
+    "cursor_prompt": "Outputs",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 4,
+    "sentence": 0,
+    "speech_text": "Let's delve into the Slide Builder and its layout refinement.",
+    "cursor_prompt": "Method: Slide Builder / Layout Refinement",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 4,
+    "sentence": 1,
+    "speech_text": "We generate slides directly from paper's LaTeX source.",
+    "cursor_prompt": "Slides",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 4,
+    "sentence": 2,
+    "speech_text": "Compiler feedback is used to iteratively fix layout and content issues.",
+    "cursor_prompt": "compiler feedback",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 4,
+    "sentence": 3,
+    "speech_text": "Our Tree Search Visual Choice is a novel technique for fine-grained layout optimization.",
+    "cursor_prompt": "Tree Search Visual Choice",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 4,
+    "sentence": 4,
+    "speech_text": "Figure 5 visually explains this process, selecting the best slide candidate.",
+    "cursor_prompt": "Figure 5: Tree Search Visual Choice",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 5,
+    "sentence": 0,
+    "speech_text": "Next, we detail the Subtitle, Cursor, and Talker Builders.",
+    "cursor_prompt": "Method: Subtitle, Cursor & Talker Builders",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 5,
+    "sentence": 1,
+    "speech_text": "Subtitles are generated per slide using a VLM for content alignment.",
+    "cursor_prompt": "Subtitles generated per slide using a VLM to align content.",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 5,
+    "sentence": 2,
+    "speech_text": "Visual Focus Prompts effectively direct the cursor to key content.",
+    "cursor_prompt": "Visual Focus Prompts",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 5,
+    "sentence": 3,
+    "speech_text": "We employ UI-TARS for spatial and WhisperX for temporal alignment of the cursor.",
+    "cursor_prompt": "UI-TARS for spatial grounding (position).",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 5,
+    "sentence": 4,
+    "speech_text": "This enhances audience guidance and accessibility significantly.",
+    "cursor_prompt": "Benefit: Enhanced audience guidance and accessibility.",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 6,
+    "sentence": 0,
+    "speech_text": "Regarding experimental settings, we compared against several baselines.",
+    "cursor_prompt": "Experimental Settings",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 6,
+    "sentence": 1,
+    "speech_text": "These include end-to-end video generation models and multi-agent methods.",
+    "cursor_prompt": "End-to-end video generation",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 6,
+    "sentence": 2,
+    "speech_text": "Human-created presentations served as a direct comparison point.",
+    "cursor_prompt": "Human-created presentations",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 6,
+    "sentence": 3,
+    "speech_text": "Our evaluation utilized the Paper2Video benchmark dataset.",
+    "cursor_prompt": "Paper2Video benchmark",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 6,
+    "sentence": 4,
+    "speech_text": "Experiments were run on NVIDIA RTX A6000 GPUs using Gemini-2.5-Flash and GPT-4.1.",
+    "cursor_prompt": "LLM/VLMs",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 7,
+    "sentence": 0,
+    "speech_text": "Now, let's look at our main experimental results.",
+    "cursor_prompt": "Experimental Results: Main",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 7,
+    "sentence": 1,
+    "speech_text": "Table 1 summarizes the performance across various metrics.",
+    "cursor_prompt": "Table 1: Main Evaluation Results",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 7,
+    "sentence": 2,
+    "speech_text": "PaperTalker significantly outperforms all baselines in automatic metrics.",
+    "cursor_prompt": "PaperTalker outperforms",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 7,
+    "sentence": 3,
+    "speech_text": "Crucially, our system achieves scores comparable to HumanMade content.",
+    "cursor_prompt": "Comparable to HumanMade",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 7,
+    "sentence": 4,
+    "speech_text": "The human evaluation also confirms our generated videos' high quality.",
+    "cursor_prompt": "Human Evaluation",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 8,
+    "sentence": 0,
+    "speech_text": "We also conducted an ablation study and analyzed efficiency.",
+    "cursor_prompt": "Experimental Results: Efficiency & Ablation",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 8,
+    "sentence": 1,
+    "speech_text": "Table 2 shows the generation cost for each method.",
+    "cursor_prompt": "Table 2: Generation cost for each method.",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 8,
+    "sentence": 2,
+    "speech_text": "Cursor Highlight markedly improves content localization and QA accuracy.",
+    "cursor_prompt": "Cursor Highlight",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 8,
+    "sentence": 3,
+    "speech_text": "Slide quality is significantly improved by our tree search refinement.",
+    "cursor_prompt": "Slide quality",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 8,
+    "sentence": 4,
+    "speech_text": "PaperTalker is 2.5 times faster than PresentAgent, highlighting efficiency.",
+    "cursor_prompt": "Speed vs. PresentAgent",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 9,
+    "sentence": 0,
+    "speech_text": "This slide presents a visual comparison of generated videos.",
+    "cursor_prompt": "Visualization Comparison",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 9,
+    "sentence": 1,
+    "speech_text": "Figure 8 compares PaperTalker against human-made, Veo3, and PresentAgent outputs.",
+    "cursor_prompt": "Figure 8: Comparison with baselines",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 9,
+    "sentence": 2,
+    "speech_text": "PaperTalker produces rich content with accurate cursor grounding.",
+    "cursor_prompt": "PaperTalker",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 9,
+    "sentence": 3,
+    "speech_text": "Unlike baselines, our videos feature an engaging talker and superior slide quality.",
+    "cursor_prompt": "Talker Cursor",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 9,
+    "sentence": 4,
+    "speech_text": "This visualization clearly demonstrates our approach's effectiveness.",
+    "cursor_prompt": "no",
+    "cursor": [
+      1008,
+      756
+    ],
+    "token": ""
+  },
+  {
+    "slide": 10,
+    "sentence": 0,
+    "speech_text": "Finally, I'll discuss limitations and outline future work.",
+    "cursor_prompt": "Limitations and Future Work",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 10,
+    "sentence": 1,
+    "speech_text": "Long-document parsing remains a challenge for extremely complex papers.",
+    "cursor_prompt": "Long-document parsing",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 10,
+    "sentence": 2,
+    "speech_text": "Accurately explaining highly technical equations is also difficult.",
+    "cursor_prompt": "Highly technical equations",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 10,
+    "sentence": 3,
+    "speech_text": "Future research includes enhanced semantic understanding for longer documents.",
+    "cursor_prompt": "Enhanced semantic understanding",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 10,
+    "sentence": 4,
+    "speech_text": "We also plan to develop real-time interactive video agents.",
+    "cursor_prompt": "real-time interactive video agents",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 11,
+    "sentence": 0,
+    "speech_text": "Thank you for your attention to our presentation.",
+    "cursor_prompt": "Thank You!",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 11,
+    "sentence": 1,
+    "speech_text": "We hope Paper2Video sparks further research in this exciting area.",
+    "cursor_prompt": "no",
+    "cursor": [
+      1008,
+      756
+    ],
+    "token": ""
+  },
+  {
+    "slide": 11,
+    "sentence": 2,
+    "speech_text": "Questions and discussion are most welcome.",
+    "cursor_prompt": "Questions and Discussion Welcome.",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 11,
+    "sentence": 3,
+    "speech_text": "Please feel free to reach out via email.",
+    "cursor_prompt": "e1374425@nus.edu.sg",
+    "cursor": [
+      1008.0,
+      756.0
+    ],
+    "token": ""
+  },
+  {
+    "slide": 11,
+    "sentence": 4,
+    "speech_text": "no",
+    "cursor_prompt": "no",
+    "cursor": [
+      1008,
+      756
+    ],
+    "token": ""
+  }
+]

@@ -10,6 +10,7 @@ from PIL import Image
 from camel.models import ModelFactory
 from camel.agents import ChatAgent
 from camel.messages import BaseMessage
+from wei_utils import get_agent_config
 
 
 
@@ -122,7 +123,6 @@ def cursor_gen_per_sentence(script_path, slide_img_dir, slide_audio_dir, cursor_
     slide_imgs = [path.join(slide_img_dir, name) for name in slide_imgs]
 
     ## use VLM API for cursor localization (fast API call, no local model needed)
-    from wei_utils import get_agent_config
     agent_config = get_agent_config(model_name)
     model = ModelFactory.create(
         model_platform=agent_config["model_platform"],

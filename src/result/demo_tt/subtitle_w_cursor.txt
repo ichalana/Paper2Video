@@ -1,0 +1,26 @@
+Welcome to our presentation on detecting safety violations across many agent traces. | title
+My name is Adam Stein, and I co-authored this work with my colleagues listed here at the University of Pennsylvania. | authors
+This research is based on our recent arXiv preprint from June 2026. | date
+###
+Current AI safety auditing mostly examines individual agent traces for failures. | first bullet point
+However, real-world violations often span multiple traces, revealing complex failure modes when analyzed collectively. | second bullet point
+For example, ransomware attacks appear benign in single traces but reveal coordinated exfiltration patterns across many. | example sentence
+Challenges include rarity, adversarial disguise, and missed detection by per-trace monitors. | challenges
+Therefore, we need novel auditing approaches that identify violations across many traces simultaneously. | final bullet point
+###
+This figure illustrates our motivating example with a Meerkat agentic search. | figure title
+Individual traces show safe actions such as recovery instructions and maintenance drafts. | left part of the figure
+However, subsets of these traces, when combined, reveal a coordinated ransomware attack pattern involving key exfiltration. | right part of the figure
+This adversarial misuse is invisible per trace but evident cross-trace as a violating witness W. | figure caption
+###
+Previous work includes trace-level monitoring for sabotage and deception, but with limitations. | first bullet
+Automated auditing through red teaming exists but often targets individual traces. | second bullet
+Corpus-scale analysis helps discovery but relies on human-in-the-loop methods. | third bullet
+Most methods miss complex hyperproperty failures across traces, a key limitation we address. | limitation bullet
+Formal methods and runtime verification do not scale well nor handle natural-language properties. | final bullet
+###
+Our goal is to audit a repository of agent traces for safety violations specified by natural-language properties. | goal statement
+Traditional methods classify traces independently, but OurMethod searches for violating sets or witnesses of traces. | first bullet
+OurMethod involves embedding traces, clustering to reveal related groups, and building an agent prompt to combine these. | steps 1-3
+We then use an agent reasoning system to propose witnesses, score traces, and emit verdicts: PASS, FAIL, or INCONCLUSIVE. | step 4 and outputs
+This approach localizes and detects failures invisible to per-trace analysis. | conclusion sentence

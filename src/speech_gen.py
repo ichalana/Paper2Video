@@ -1,8 +1,19 @@
 import re
 import os
+import gc
 import cv2
 import json
 import torch
+
+# PyTorch 2.6+ changed weights_only default to True; patch torch.load so
+# whisperx/pyannote checkpoints (which use omegaconf globals) still load.
+_orig_torch_load = torch.load
+def _patched_torch_load(*args, **kwargs):
+    if kwargs.get("weights_only", None) is None:
+        kwargs["weights_only"] = False
+    return _orig_torch_load(*args, **kwargs)
+torch.load = _patched_torch_load
+
 import whisperx
 from os import path
 from f5_tts.api import F5TTS
@@ -18,9 +29,35 @@ def transcribe_with_whisperx(audio_path, lang="en", device="cuda" if torch.cuda.
     text = " ".join(seg["text"].strip() for seg in segments)
     return text
 
+# Reuse a single F5TTS instance across slides so we don't reload weights
+# and to keep GPU memory pressure predictable.
+_F5_INSTANCE = None
+
+
+def _free_memory():
+    """Release unused tensors from the MPS / CUDA cache between slides."""
+    gc.collect()
+    if torch.backends.mps.is_available():
+        try:
+            torch.mps.empty_cache()
+        except Exception:
+            pass
+    if torch.cuda.is_available():
+        try:
+            torch.cuda.empty_cache()
+        except Exception:
+            pass
+
+
 def inference_f5(text_prompt, save_path, ref_audio, ref_text):
-    f5tts = F5TTS()
-    wav, sr, spec = f5tts.infer(ref_file=ref_audio, ref_text=ref_text, gen_text=text_prompt, file_wave=save_path, seed=None,)
+    global _F5_INSTANCE
+    if _F5_INSTANCE is None:
+        _F5_INSTANCE = F5TTS()
+    _F5_INSTANCE.infer(
+        ref_file=ref_audio, ref_text=ref_text, gen_text=text_prompt,
+        file_wave=save_path, seed=None,
+    )
+    _free_memory()
 
 def parse_script(script_text):
     pages = script_text.strip().split("###\n")
@@ -55,3 +92,4 @@ def tts_per_slide(model_type, script_path, speech_save_dir, ref_audio, ref_text=
             continue
         if ref_text is None: ref_text = transcribe_with_whisperx(ref_audio)
         if model_type == "f5": inference_f5(subtitle, speech_result_path, ref_audio, ref_text)
+        _free_memory()

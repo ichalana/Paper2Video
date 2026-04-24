@@ -1,0 +1,244 @@
+[
+  {
+    "slide": 0,
+    "sentence": 0,
+    "speech_text": "Welcome to our presentation on detecting safety violations across many agent traces.",
+    "cursor_prompt": "title",
+    "cursor": [
+      1008.0,
+      150.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'title' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(1008, 150)"
+  },
+  {
+    "slide": 0,
+    "sentence": 1,
+    "speech_text": "My name is Adam Stein, and I co-authored this work with my colleagues listed here at the University of Pennsylvania.",
+    "cursor_prompt": "authors",
+    "cursor": [
+      800.0,
+      360.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'authors' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(800, 360)"
+  },
+  {
+    "slide": 0,
+    "sentence": 2,
+    "speech_text": "This research is based on our recent arXiv preprint from June 2026.",
+    "cursor_prompt": "date",
+    "cursor": [
+      1008.0,
+      620.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'date' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(1008, 620)"
+  },
+  {
+    "slide": 1,
+    "sentence": 0,
+    "speech_text": "Current AI safety auditing mostly examines individual agent traces for failures.",
+    "cursor_prompt": "first bullet point",
+    "cursor": [
+      110.0,
+      230.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'first bullet point' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(110, 230)"
+  },
+  {
+    "slide": 1,
+    "sentence": 1,
+    "speech_text": "However, real-world violations often span multiple traces, revealing complex failure modes when analyzed collectively.",
+    "cursor_prompt": "second bullet point",
+    "cursor": [
+      110.0,
+      280.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'second bullet point' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(110, 280)"
+  },
+  {
+    "slide": 1,
+    "sentence": 2,
+    "speech_text": "For example, ransomware attacks appear benign in single traces but reveal coordinated exfiltration patterns across many.",
+    "cursor_prompt": "example sentence",
+    "cursor": [
+      110.0,
+      335.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'example sentence' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(110, 335)"
+  },
+  {
+    "slide": 1,
+    "sentence": 3,
+    "speech_text": "Challenges include rarity, adversarial disguise, and missed detection by per-trace monitors.",
+    "cursor_prompt": "challenges",
+    "cursor": [
+      110.0,
+      385.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'challenges' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(110, 385)"
+  },
+  {
+    "slide": 1,
+    "sentence": 4,
+    "speech_text": "Therefore, we need novel auditing approaches that identify violations across many traces simultaneously.",
+    "cursor_prompt": "final bullet point",
+    "cursor": [
+      110.0,
+      465.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'final bullet point' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(110, 465)"
+  },
+  {
+    "slide": 2,
+    "sentence": 0,
+    "speech_text": "This figure illustrates our motivating example with a Meerkat agentic search.",
+    "cursor_prompt": "figure title",
+    "cursor": [
+      180.0,
+      700.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'figure title' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(180, 700)"
+  },
+  {
+    "slide": 2,
+    "sentence": 1,
+    "speech_text": "Individual traces show safe actions such as recovery instructions and maintenance drafts.",
+    "cursor_prompt": "left part of the figure",
+    "cursor": [
+      300.0,
+      620.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'left part of the figure' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(300, 620)"
+  },
+  {
+    "slide": 2,
+    "sentence": 2,
+    "speech_text": "However, subsets of these traces, when combined, reveal a coordinated ransomware attack pattern involving key exfiltration.",
+    "cursor_prompt": "right part of the figure",
+    "cursor": [
+      1700.0,
+      670.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'right part of the figure' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(1700, 670)"
+  },
+  {
+    "slide": 2,
+    "sentence": 3,
+    "speech_text": "This adversarial misuse is invisible per trace but evident cross-trace as a violating witness W.",
+    "cursor_prompt": "figure caption",
+    "cursor": [
+      320.0,
+      1260.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'figure caption' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(320, 1260)"
+  },
+  {
+    "slide": 3,
+    "sentence": 0,
+    "speech_text": "Previous work includes trace-level monitoring for sabotage and deception, but with limitations.",
+    "cursor_prompt": "first bullet",
+    "cursor": [
+      120.0,
+      230.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'first bullet' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(120, 230)"
+  },
+  {
+    "slide": 3,
+    "sentence": 1,
+    "speech_text": "Automated auditing through red teaming exists but often targets individual traces.",
+    "cursor_prompt": "second bullet",
+    "cursor": [
+      120.0,
+      270.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'second bullet' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(120, 270)"
+  },
+  {
+    "slide": 3,
+    "sentence": 2,
+    "speech_text": "Corpus-scale analysis helps discovery but relies on human-in-the-loop methods.",
+    "cursor_prompt": "third bullet",
+    "cursor": [
+      120.0,
+      320.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'third bullet' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(120, 320)"
+  },
+  {
+    "slide": 3,
+    "sentence": 3,
+    "speech_text": "Most methods miss complex hyperproperty failures across traces, a key limitation we address.",
+    "cursor_prompt": "limitation bullet",
+    "cursor": [
+      120.0,
+      370.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'limitation bullet' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(120, 370)"
+  },
+  {
+    "slide": 3,
+    "sentence": 4,
+    "speech_text": "Formal methods and runtime verification do not scale well nor handle natural-language properties.",
+    "cursor_prompt": "final bullet",
+    "cursor": [
+      120.0,
+      415.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'final bullet' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(120, 415)"
+  },
+  {
+    "slide": 4,
+    "sentence": 0,
+    "speech_text": "Our goal is to audit a repository of agent traces for safety violations specified by natural-language properties.",
+    "cursor_prompt": "goal statement",
+    "cursor": [
+      150.0,
+      270.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'goal statement' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(150, 270)"
+  },
+  {
+    "slide": 4,
+    "sentence": 1,
+    "speech_text": "Traditional methods classify traces independently, but OurMethod searches for violating sets or witnesses of traces.",
+    "cursor_prompt": "first bullet",
+    "cursor": [
+      150.0,
+      320.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'first bullet' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(150, 320)"
+  },
+  {
+    "slide": 4,
+    "sentence": 2,
+    "speech_text": "OurMethod involves embedding traces, clustering to reveal related groups, and building an agent prompt to combine these.",
+    "cursor_prompt": "steps 1-3",
+    "cursor": [
+      150.0,
+      320.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'steps 1-3' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(150, 320)"
+  },
+  {
+    "slide": 4,
+    "sentence": 3,
+    "speech_text": "We then use an agent reasoning system to propose witnesses, score traces, and emit verdicts: PASS, FAIL, or INCONCLUSIVE.",
+    "cursor_prompt": "step 4 and outputs",
+    "cursor": [
+      150.0,
+      460.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'step 4 and outputs' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(150, 460)"
+  },
+  {
+    "slide": 4,
+    "sentence": 4,
+    "speech_text": "This approach localizes and detects failures invisible to per-trace analysis.",
+    "cursor_prompt": "conclusion sentence",
+    "cursor": [
+      150.0,
+      360.0
+    ],
+    "token": "This is a presentation slide (size: 2016x1512 pixels). Find the location of 'conclusion sentence' in the slide. Respond with only pixel coordinates in this exact format: click(x, y) where x is the horizontal pixel (0 to 2016) and y is the vertical pixel (0 to 1512).click(150, 360)"
+  }
+]

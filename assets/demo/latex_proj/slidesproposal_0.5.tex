@@ -1,0 +1,73 @@
+\documentclass{beamer}
+
+
+\usetheme{metropolis} % Modern academic theme
+\usecolortheme{default}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{bm}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{caption} % Added to define \captionof
+
+% Highlight key terms
+\newcommand{\alertterm}[1]{\alert{\textbf{#1}}}
+
+% Title and author information
+\title[Paper2Video]{\includegraphics[height=0.6cm]{figure/logo_.png} Paper2Video: Automatic Video Generation from Scientific Papers}
+\author[Z. Zhu, K. Q. Lin, M. Z. Shou]{
+  Zeyu Zhu\textsuperscript{*}, Kevin Qinghong Lin\textsuperscript{*}, Mike Zheng Shou\textsuperscript{$\dag$} \\
+  {\small Show Lab, National University of Singapore}
+}
+\date{\today}
+
+\setbeamerfont{caption}{size=\scriptsize}
+
+
+\setbeamerfont{caption}{size=\scriptsize}
+\begin{document}
+\begin{frame}{Ablation Study: Impact of Cursor and Tree Search Modules}
+
+\begin{columns}[t]
+  \begin{column}{0.45\textwidth}
+  \small
+  \begin{itemize}
+    \item \alertterm{Cursor Highlight}: Improves content localization, increasing QA accuracy from 8\% to 63\%.
+    \item \alertterm{Tree Search Visual Choice}: Fixes layout overflows and improves slide design and coherence.
+  \end{itemize}
+  \vspace{0.3cm}
+  \scriptsize
+  \textbf{Table: Ablation on Cursor}
+  \begin{tabular}{lc}
+    \toprule
+    Method & Localization Accuracy \\
+    \midrule
+    Without Cursor & 0.084 \\
+    With Cursor & \textbf{0.633} \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.7cm}
+  \textbf{Table: Slide Quality Evaluation}
+  
+  \begin{tabular}{lccc}
+    \toprule
+    Method & Content & Design & Coherence \\
+    \midrule
+    HumanMade & \textbf{4.43} & \textbf{2.85} & 2.73 \\
+    PPTAgent & 3.43 & 1.57 & 1.29 \\
+    PaperTalker (no TS) & 4.33 & \underline{2.73} & \textbf{3.84} \\
+    PaperTalker & \underline{4.34} & \textbf{2.85} & \textbf{3.84} \\
+    \bottomrule
+  \end{tabular}
+  \end{column}
+  \begin{column}{0.55\textwidth}
+    \centering
+    \includegraphics[width=0.5\textwidth]{figure/tree_search_vis.pdf}
+    \captionof{figure}{Slides before (top row) and after (bottom row) Tree Search Visual Choice layout refinement.}
+  \end{column}
+\end{columns}
+\end{frame}
+\end{document}

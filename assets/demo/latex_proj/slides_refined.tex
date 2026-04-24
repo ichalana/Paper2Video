@@ -1,0 +1,303 @@
+\documentclass{beamer}
+
+
+\usetheme{metropolis} % Modern academic theme
+\usecolortheme{default}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{bm}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{caption} % Added to define \captionof
+
+% Highlight key terms
+\newcommand{\alertterm}[1]{\alert{\textbf{#1}}}
+
+% Title and author information
+\title[Paper2Video]{\includegraphics[height=0.6cm]{figure/logo_.png} Paper2Video: Automatic Video Generation from Scientific Papers}
+\author[Z. Zhu, K. Q. Lin, M. Z. Shou]{
+  Zeyu Zhu\textsuperscript{*}, Kevin Qinghong Lin\textsuperscript{*}, Mike Zheng Shou\textsuperscript{$\dag$} \\
+  {\small Show Lab, National University of Singapore}
+}
+\date{\today}
+
+\setbeamerfont{caption}{size=\scriptsize}
+
+
+\setbeamerfont{caption}{size=\scriptsize}
+\begin{document}
+\begin{frame}
+  \titlepage
+  \vspace{-1cm}
+  \begin{center}
+    \scriptsize
+    \textsuperscript{*} Equal Contribution \quad
+    \textsuperscript{$\dag$} Corresponding Author \\
+    \texttt{e1374425@nus.edu.sg}
+  \end{center}
+\end{frame}
+\begin{frame}{Motivation: Need for Automated Academic Presentation Videos}
+\begin{columns}
+\begin{column}{0.55\textwidth}
+\begin{itemize}
+  \item Academic presentation videos critical for research dissemination.
+  \item Manual production is highly \alertterm{labor-intensive}, requiring hours for just a few minutes.
+  \item Unique challenges:
+  \begin{itemize}
+    \item Long-context multi-modal input from dense scientific papers.
+    \item Multi-channel alignment: slides, subtitles, speech, talking-head, cursor.
+    \item No existing benchmarks or tailored metrics to evaluate quality.
+  \end{itemize}
+  \item \alertterm{Key questions:}
+  \begin{itemize}
+    \item What defines a \alertterm{good academic presentation video}?
+    \item How to \alertterm{automatically generate} such videos from papers?
+  \end{itemize}
+\end{itemize}
+\end{column}
+\begin{column}{0.45\textwidth}
+\centering
+\includegraphics[width=1\textwidth]{figure/teaser.pdf}
+\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}{Related Work: Landscape and Challenges}
+\begin{itemize}
+  \item \textbf{Natural Video Generation:}
+  \begin{itemize}
+    \item Diffusion models generate short videos from text~\cite{sd_video,wan}.
+    \item Long and multi-shot videos remain challenging~\cite{deepmind2025veo3}.
+  \end{itemize}
+  \item \textbf{Multi-agent frameworks for videos:}
+  \begin{itemize}
+    \item MovieAgent generates movies via role decomposition~\cite{wu2025automated}.
+    \item PresentAgent combines slide and speech but lacks personalization and academic slide quality~\cite{shi2025presentagent}.
+  \end{itemize}
+  \item \textbf{AI for Research:}
+  \begin{itemize}
+    \item Automatic generation of scientific posters~\cite{pang2025paper2poster} and slides~\cite{zheng2025pptagent}.
+    \item Few efforts on \alertterm{academic presentation video synthesis}.
+  \end{itemize}
+  \item \alertterm{Our work fills this gap}, focusing on long, multimodal, personalized academic video generation with comprehensive evaluation.
+\end{itemize}
+\end{frame}
+\begin{frame}{Method Overview: The PaperTalker Agent}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\textwidth]{figure/method.pdf}
+    \caption{Pipeline of \alertterm{PaperTalker}: Modular multi-agent approach integrating slide generation, subtitle/cursor creation, and talking-head synthesis.}
+    \label{fig:method}
+\end{figure}
+\vspace{-0.8cm}
+\begin{block}{Key Modules}
+\footnotesize
+\footnotesize
+\begin{itemize}
+  \item \alertterm{Slide Builder}: Generates \LaTeX~Beamer slides, refines layouts via compilation feedback.
+  \item \alertterm{Subtitle \& Cursor Builder}: Produces aligned subtitles with spatially grounded cursor trajectories.
+  \item \alertterm{Talker Builder}: Synthesizes personalized speech and renders talking-head videos.
+  \item Supports \alertterm{slide-wise parallelization} for efficiency.
+\end{itemize}
+\end{block}
+\end{frame}
+\begin{frame}{Method: Slide Builder and Layout Refinement}
+\begin{itemize}
+  \item \alertterm{Slides are generated directly} from the paper’s \LaTeX~source using Beamer for professional academic layouts.
+  \item Compilation feedback (errors, warnings) used to iteratively fix code ensuring correctness.
+  \item \alertterm{Tree Search Visual Choice:}
+  \begin{itemize}
+    \item Rule-based generation of layout variants by adjusting font and figure scales.
+    \item Use vision-language model to \alertterm{select the best candidate visually}.
+    \item Solves overflow and layout issues efficiently beyond parameter tuning by LLMs.
+  \end{itemize}
+\end{itemize}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.25\textwidth]{figure/tree_search.pdf}
+    \caption{Tree Search Visual Choice for slide layout refinement.}
+    \label{fig:mcts}
+\end{figure}
+\end{frame}
+\begin{frame}{Method: Subtitle and Cursor Builder}
+\begin{itemize}
+  \item Subtitles are generated for each slide with a vision-language model.
+  \item \alertterm{Visual focus prompts} highlight key content for each subtitle sentence.
+  \item Cursor trajectory is \alertterm{spatially aligned} per sentence using GUI-grounding models.
+  \item \alertterm{Temporal alignment} with narration timing achieved using WhisperX.
+\end{itemize}
+\begin{block}{Benefit}
+\footnotesize
+\begin{itemize}
+  \item \alertterm{Enhanced audience guidance} by highlighting the precise focus of the narration on the slides.
+  \item Improves accessibility and content grounding.
+\end{itemize}
+\end{block}
+\end{frame}
+\begin{frame}{Method: Talker Builder and Parallelization}
+\begin{itemize}
+  \item Personalize speech synthesis using author voice sample with F5-TTS at slide granularity.
+  \item Talking-head video generated based on author portrait using FantasyTalking and Hallo2.
+  \item \alertterm{Slide-wise parallel generation} for significant acceleration (6$\times$ speedup).
+  \item You save hours of generation time while preserving video quality and engagement.
+\end{itemize}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\textwidth]{figure/presenter.png}
+  \caption{Personalized \alertterm{talking-head} presenter output.}
+  \label{fig:presenter}
+\end{figure}
+\end{frame}
+\begin{frame}{Experimental Settings}
+\begin{itemize}
+  \item \alertterm{Baselines:}
+  \begin{itemize}
+    \item End-to-end video generation models (e.g., Wan2.2, Veo3).
+    \item Multi-agent frameworks (e.g., PresentAgent).
+    \item Human-created presentations as upper bound.
+  \end{itemize}
+  \item \alertterm{Dataset:} Paper2Video benchmark with 101 paper-video pairs from recent AI conferences.
+  \item Hardware: 8$\times$ NVIDIA RTX A6000 GPUs.
+  \item Evaluation Models:
+  \begin{itemize}
+    \item Vision-language model: GPT-4.1.
+    \item Video language model: Gemini-2.5-Flash.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+\begin{frame}{Experimental Results: Main Evaluation}
+\begin{table}[ht]
+  \centering
+  \tiny
+  \caption{\textbf{Main evaluation results on Paper2Video benchmark.} Note: $\text{PaperTalker}^{*}$ is without presenter/cursor.}
+  \label{tab:main_result}
+  \begin{tabular}{l c c c c c}
+    \toprule
+    \textbf{Method} & \textbf{Sim. (Speech/Content)} & \textbf{Arena Win} & \textbf{PresentQuiz} & \textbf{IP Mem.} & \textbf{Duration (s)} \\
+    \midrule
+    HumanMade & \alertterm{1.00 / 5.00} & \alertterm{50\%} & 0.738 / 0.908 & - & 375 \\
+    \midrule
+    Wan2.2 & NA / NA & 1.1\% & 0.251 / 0.551 & 11.5\% & 4 \\
+    Veo3 & 0.133 / NA & 1.2\% & 0.367 / 0.585 & 31.3\% & 8 \\
+    PresentAgent & 0.045 / 1.47 & 2.0\% & 0.548 / 0.654 & 12.5\% & 430 \\
+    PaperTalker$^{*}$ & \alertterm{0.646} / \alertterm{1.97} & 15.2\% & 0.835 / 0.949 & 37.5\% & 234 \\
+    PaperTalker & \alertterm{0.646} / \alertterm{1.97} & \alertterm{17.0\%} & \alertterm{0.842} / \alertterm{0.951} & \alertterm{50.0\%} & 234 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\vspace{-1.2em}
+\begin{columns}
+\begin{column}{0.55\textwidth}
+\includegraphics[width=0.9\textwidth]{figure/human_evaluation_bar.pdf}
+\end{column}
+\begin{column}{0.45\textwidth}
+{\scriptsize
+\begin{itemize}
+  \item \alertterm{PaperTalker} outperforms all baselines in both automatic and human evaluations.
+  \item Presenter video boosts engagement and quality preference by approx. 10\%.
+\end{itemize}
+}
+\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}{Experimental Results: Efficiency and Cost}
+\begin{table}[ht]
+  \centering
+  \small
+  \caption{\textbf{Generation cost for each method.}}
+  \label{table:cost}
+  \setlength{\tabcolsep}{6pt}
+  \begin{tabular}{lccc}
+    \toprule
+    Method & Token (K)$\downarrow$ & Time (min)$\downarrow$ & Cost (\$)$\downarrow$ \\
+    \midrule
+    Veo3~\cite{deepmind2025veo3} & NA & \textbf{0.4} & 1.667 \\
+    Wan2.2~\cite{wan} & NA & 8.1 & 0.280 \\
+    \midrule
+    PresentAgent~\cite{shi2025presentagent} & 241 & 39.5 & 0.003 \\
+    PaperTalker (w/o Talker) & \textbf{62} & 15.6 & \textbf{0.001} \\
+    PaperTalker (w/o Parallel) & \textbf{62} & 287.2 & \textbf{0.001} \\
+    PaperTalker & \textbf{62} & \textbf{48.1 (6$\times$ faster)} & \textbf{0.001} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\vspace{-1em}
+\begin{itemize}
+  \item Parallel generation yields \alertterm{6$\times$ speedup} vs. serial.
+  \item PaperTalker achieves \alertterm{lowest generation cost} among compared methods.
+\end{itemize}
+\end{frame}
+\begin{frame}{Ablation Study: Impact of Cursor and Tree Search Modules}
+
+\begin{columns}[t]
+  \begin{column}{0.45\textwidth}
+  \small
+  \begin{itemize}
+    \item \alertterm{Cursor Highlight}: Improves content localization, increasing QA accuracy from 8\% to 63\%.
+    \item \alertterm{Tree Search Visual Choice}: Fixes layout overflows and improves slide design and coherence.
+  \end{itemize}
+  \vspace{0.3cm}
+  \scriptsize
+  \textbf{Table: Ablation on Cursor}
+  \begin{tabular}{lc}
+    \toprule
+    Method & Localization Accuracy \\
+    \midrule
+    Without Cursor & 0.084 \\
+    With Cursor & \textbf{0.633} \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.7cm}
+  \textbf{Table: Slide Quality Evaluation}
+  
+  \begin{tabular}{lccc}
+    \toprule
+    Method & Content & Design & Coherence \\
+    \midrule
+    HumanMade & \textbf{4.43} & \textbf{2.85} & 2.73 \\
+    PPTAgent & 3.43 & 1.57 & 1.29 \\
+    PaperTalker (no TS) & 4.33 & \underline{2.73} & \textbf{3.84} \\
+    PaperTalker & \underline{4.34} & \textbf{2.85} & \textbf{3.84} \\
+    \bottomrule
+  \end{tabular}
+  \end{column}
+  \begin{column}{0.55\textwidth}
+    \centering
+    \includegraphics[width=0.75\textwidth]{figure/tree_search_vis.pdf}
+    \captionof{figure}{Slides before (top row) and after (bottom row) Tree Search Visual Choice layout refinement.}
+  \end{column}
+\end{columns}
+\end{frame}
+\begin{frame}{Limitations and Future Research Directions}
+\begin{itemize}
+  \item \alertterm{Current Limitations:}
+  \begin{itemize}
+    \item Difficulty in parsing long scientific documents with complex equations end-to-end.
+    \item Some layouts and slide designs still need refinement.
+    \item Talking-head synthesis quality and naturalness can be improved further.
+  \end{itemize}
+  \item \alertterm{Future Directions:}
+  \begin{itemize}
+    \item Real-time interactive presentation video agents enabling Q\&A and dynamic tutorials.
+    \item Enhanced semantic understanding of longer, complex papers.
+    \item Support for multilingual presentations and accessibility features.
+    \item Closed-loop evaluation with human and AI-in-the-loop feedback.
+    \item Full open-sourcing for community collaboration.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+\begin{frame}
+  \centering
+  \Huge \textbf{Thank You!}
+  \vspace{0.7cm}
+
+  \includegraphics[width=0.15\textwidth]{figure/logo_.png}
+
+  \vspace{0.3cm}
+  \large
+  \texttt{Questions and Discussion Welcome} \\
+  \href{mailto:e1374425@nus.edu.sg}{e1374425@nus.edu.sg}
+\end{frame}
+\end{document}

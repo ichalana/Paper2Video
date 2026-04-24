@@ -27,11 +27,11 @@
   <a href="https://x.com/KevinQHLin/status/1976105129146257542">💬 X (Twitter)</a>
 </p>
 
-- **Input:** a paper ➕ an image ➕ an audio
-  
-| Paper | Image | Audio |
-|--------|--------|--------|
-| <img src="https://github.com/showlab/Paper2Video/blob/page/assets/hinton/paper.png" width="180"/><br>[🔗 Paper link](https://arxiv.org/pdf/1509.01626) | <img src="https://github.com/showlab/Paper2Video/blob/page/assets/hinton/hinton_head.jpeg" width="180"/> <br>Hinton's photo| <img src="assets/sound.png" width="180"/><br>[🔗 Audio sample](https://github.com/showlab/Paper2Video/blob/page/assets/hinton/ref_audio_10.wav) |
+- **Input:** a paper ➕ an audio
+
+| Paper | Audio |
+|--------|--------|
+| <img src="https://github.com/showlab/Paper2Video/blob/page/assets/hinton/paper.png" width="180"/><br>[🔗 Paper link](https://arxiv.org/pdf/1509.01626) | <img src="assets/sound.png" width="180"/><br>[🔗 Audio sample](https://github.com/showlab/Paper2Video/blob/page/assets/hinton/ref_audio_10.wav) |
 
 
 - **Output:** a presentation video
@@ -84,8 +84,8 @@ https://github.com/user-attachments/assets/a655e3c7-9d76-4c48-b946-1068fdb6cdd9
 
 This work solves two core problems for academic presentations:
 
-- **Left: How to create a presentation video from a paper?**  
-  *PaperTalker* — an agent that integrates **slides**, **subtitling**, **cursor grounding**, **speech synthesis**, and **talking-head video rendering**.
+- **Left: How to create a presentation video from a paper?**
+  *PaperTalker* — an agent that integrates **slides**, **subtitling**, **cursor grounding**, and **speech synthesis** to produce a narrated presentation video.
 
 - **Right: How to evaluate a presentation video?**  
   *Paper2Video* — a benchmark with well-designed metrics to evaluate presentation quality.
@@ -107,19 +107,6 @@ conda activate p2v
 pip install -r requirements.txt
 conda install -c conda-forge tectonic
 ```
-**[Optional] [Skip](#2-configure-llms) this part if you do not need a human presenter.**
-
-Download the dependent code and follow the instructions in **[Hallo2](https://github.com/fudan-generative-vision/hallo2)** to download the model weight.
-```bash
-git clone https://github.com/fudan-generative-vision/hallo2.git
-```
-You need to **prepare the environment separately for talking-head generation** to potential avoide package conflicts, please refer to  <a href="git clone https://github.com/fudan-generative-vision/hallo2.git">Hallo2</a>. After installing, use `which python` to get the python environment path.
-```bash
-cd hallo2
-conda create -n hallo python=3.10
-conda activate hallo
-pip install -r requirements.txt
-```
 
 ### 2. Configure LLMs
 Export your **API credentials**:
@@ -127,54 +114,50 @@ Export your **API credentials**:
 export GEMINI_API_KEY="your_gemini_key_here"
 export OPENAI_API_KEY="your_openai_key_here"
 ```
-The best practice is to use **GPT4.1** or **Gemini2.5-Pro** for both LLM and VLMs. We also support locally deployed open-source model(e.g., Qwen), details please referring to <a href="https://github.com/Paper2Poster/Paper2Poster.git">Paper2Poster</a>.
+The best practice is to use **GPT-4.1** or **Gemini 2.5 Pro** for the LLM, and **Gemini 2.5 Flash** for the VLM. We also support locally deployed open-source models (e.g., Qwen), see <a href="https://github.com/Paper2Poster/Paper2Poster.git">Paper2Poster</a> for details.
 
 ### 3. Inference
-The script `pipeline.py` provides an automated pipeline for generating academic presentation videos. It takes **LaTeX paper sources** together with **reference image/audio** as input, and goes through multiple sub-modules (Slides → Subtitles → Speech → Cursor → Talking Head) to produce a complete presentation video. ⚡ The minimum recommended GPU for running this pipeline is **NVIDIA A6000** with 48G.
+The pipeline takes a **LaTeX paper project** together with a **reference audio** as input, and automatically produces a complete narrated presentation video (Slides → Script → Speech → Cursor → Final Video).
 
 #### Example Usage
-Run the following command to launch a fast generation (**without talking-head generation**):
+
 ```bash
 python pipeline_light.py \
     --model_name_t gpt-4.1 \
-    --model_name_v gpt-4.1 \
+    --model_name_v gemini-2.5-flash \
     --result_dir /path/to/output \
     --paper_latex_root /path/to/latex_proj \
-    --ref_img /path/to/ref_img.png \
-    --ref_audio /path/to/ref_audio.wav \
-    --gpu_list [0,1,2,3,4,5,6,7]
+    --ref_audio /path/to/ref_audio.wav
 ```
 
-Run the following command to launch a full generation (**with talking-head generation**):
+You can also run individual stages using `--stage`:
 
 ```bash
-python pipeline.py \
-    --model_name_t gpt-4.1 \
-    --model_name_v gpt-4.1 \
-    --model_name_talking hallo2 \
-    --result_dir /path/to/output \
-    --paper_latex_root /path/to/latex_proj \
-    --ref_img /path/to/ref_img.png \
-    --ref_audio /path/to/ref_audio.wav \
-    --talking_head_env /path/to/hallo2_env \
-    --gpu_list [0,1,2,3,4,5,6,7]
+# Stage 1 only: generate slides
+python pipeline_light.py --stage "[\"1\"]" ...
+
+# Stage 2 only: generate script, speech, and cursor data
+python pipeline_light.py --stage "[\"2\"]" ...
+
+# Stage 3 only: merge and render final video
+python pipeline_light.py --stage "[\"3\"]" ...
 ```
+
+#### Arguments
 
 | Argument | Type | Default | Description |
 |----------|------|---------|-------------|
-| `--model_name_t` | `str` | `gpt-4.1` | LLM |
-| `--model_name_v` | `str` | `gpt-4.1` | VLM |
-| `--model_name_talking` | `str` | `hallo2` | Talking Head model. Currently only **hallo2** is supported |
-| `--result_dir` | `str` | `/path/to/output` | Output directory (slides, subtitles, videos, etc.) |
-| `--paper_latex_root` | `str` | `/path/to/latex_proj` | Root directory of the LaTeX paper project |
-| `--ref_img` | `str` | `/path/to/ref_img.png` | Reference image (must be **square** portrait) |
-| `--ref_audio` | `str` | `/path/to/ref_audio.wav` | Reference audio (recommended: ~10s) |
-| `--ref_text` | `str` | `None` | Optional reference text (for style guidance for subtitles) |
-| `--beamer_templete_prompt` | `str` | `None` | Optional reference text (for style guidance for slides) |
-| `--gpu_list` | `list[int]` | `""` | GPU list for parallel execution (used in **cursor generation** and **Talking Head rendering**) |
-| `--if_tree_search` | `bool` | `True` | Whether to enable tree search for slide layout refinement |
-| `--stage` | `str` | `"[0]"` | Pipeline stages to run (e.g., `[0]` full pipeline, `[1,2,3]` partial stages) |
-| `--talking_head_env` | `str` | `/path/to/hallo2_env` | python environment path for talking-head generation |
+| `--model_name_t` | `str` | `gpt-4.1` | LLM used for slide generation |
+| `--model_name_v` | `str` | `gpt-4.1` | VLM used for script and cursor generation |
+| `--result_dir` | `str` | `./result/zeyu` | Output directory (slides, audio, cursor data, videos) |
+| `--paper_latex_root` | `str` | `./assets/demo/latex_proj` | Root directory of the LaTeX paper project |
+| `--ref_audio` | `str` | `./assets/demo/zeyu.wav` | Reference audio for voice cloning (recommended: ~10s) |
+| `--ref_text` | `str` | `None` | Optional transcript of the reference audio (auto-transcribed if not provided) |
+| `--ref_img` | `str` | `./assets/demo/zeyu.png` | Reference image — used only for output naming |
+| `--beamer_templete_prompt` | `str` | `None` | Optional Beamer theme name for slide styling |
+| `--gpu_list` | `list[int]` | `[]` | GPU indices for cursor generation (e.g. `0,1`) |
+| `--if_tree_search` | `bool` | `True` | Enable VLM-based layout refinement for slides |
+| `--stage` | `str` | `"[\"0\"]"` | Stages to run: `0`=all, `1`=slides, `2`=speech+cursor, `3`=merge |
 ---
 
 ## 📊 Evaluation: Paper2Video
