@@ -2,16 +2,16 @@
 High-Retention TikTok Paper2Video Pipeline
 ==========================================
 
-Generates a vertical (9:16, 1080x1920) ~45-second video designed for maximum
+Generates a vertical (9:16, 4K) 45-65 second video designed for maximum
 retention on TikTok/Reels/Shorts.
 
 Architecture:
-  1. Slide Generation  — vertical 9:16 beamer slides (hook-first, visual-heavy)
-  2. Script Generation — 3-part structure: Hook (0-3s) / Narrative (3-30s) / Flex (30-45s)
-  3. Jargon Filter     — converts academic language to punchy social media style
-  4. TTS + Pacing      — breathless voiceover with silence removal
-  5. Visual Assembly   — 3-second cut rule, Ken Burns, b-roll, code scroll, impact captions
-  6. Audio Mixing      — background music with voice-triggered ducking
+  1. Slide Generation  — vertical 9:16 dark-themed beamer slides
+  2. Script Generation — 3-part structure: Hook / Narrative / Flex + jargon filter
+  3. TTS + Pacing      — F5-TTS voice-cloned voiceover with silence removal
+  4. Visual Assembly   — static slides with AI-generated hook image
+  5. Audio Mixing      — background music with voice-triggered ducking
+  6. Subtitles         — WhisperX karaoke-style word highlighting
   7. Final Mux         — video + audio with fade-out
 """
 

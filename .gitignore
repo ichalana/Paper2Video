@@ -3,3 +3,34 @@
 __pycache__/
 *.pyc
 *.pyo
+
+# Results / output
+src/result/
+*.mp4
+*.wav
+*.mp3
+
+# LaTeX intermediates
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+*.synctex.gz
+
+# Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+

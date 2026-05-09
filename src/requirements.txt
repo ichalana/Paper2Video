@@ -15,3 +15,5 @@ PyMuPDF
 whisperx
 pdf2image
 opencv_python
+python-dotenv
+openai

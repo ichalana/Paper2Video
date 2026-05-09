@@ -165,45 +165,44 @@ python pipeline_light.py --stage "[\"3\"]" ...
 
 ## 🎬 TikTok Pipeline
 
-Generate high-retention vertical videos (9:16, ~45s) optimized for TikTok, Reels, and Shorts. The pipeline produces viral-style content from academic papers with no manual editing.
+Generate high-retention vertical videos (9:16, 4K) optimized for TikTok, Reels, and Shorts. The pipeline produces viral-style content from academic papers with no manual editing — 45-65 second videos with voice-cloned narration, karaoke subtitles, and dark-themed slides.
 
 ### Key Features
 
 | Feature | Description |
 |---------|-------------|
-| **Hook-First Scripting** | 3-part structure: Hook (0-3s) / Narrative (3-30s) / Flex (30-45s) — opens with a provocative claim, not a title slide |
+| **Hook-First Scripting** | 3-part structure: Hook / Narrative / Flex — opens with a provocative claim, not a title slide |
 | **Jargon Filter** | Auto-replaces academic phrasing ("our methodology leverages...") with punchy alternatives ("we built a system that uses...") |
-| **3-Second Cut Rule** | No visual stays on screen for more than 3 seconds — cycles through Ken Burns effects, b-roll, and code-scroll animations |
-| **Ken Burns Effects** | 6 zoom/pan presets applied to slide images (zoom-in, pan top-to-bottom, etc.) for dynamic movement |
-| **Procedural B-Roll** | FFmpeg-generated abstract tech visuals (mandelbrot zooms, plasma gradients, digital glitch, waveforms) |
-| **Impact Captions** | Bold 1-3 word captions burned into frames ("4X BETTER", "GAME OVER") |
+| **AI Hook Image** | DALL-E 3 generates a vertical hero image for the intro (graceful fallback to first slide) |
+| **4K Vertical Output** | Native 2160x3840 rendering for crisp playback on modern phones |
 | **Audio Ducking** | Background music auto-lowers when voiceover is active via sidechain compression |
 | **Breathless Pacing** | Silence removal from TTS for fast-paced, no-pause delivery |
-| **Readability Guard** | Dense figures with small text are auto-replaced with b-roll |
+| **Karaoke Subtitles** | WhisperX word-level alignment highlights the current word in real time |
+| **Voice Cloning** | F5-TTS clones any reference speaker from a ~10s audio sample |
+| **Dark Slide Theme** | High-contrast dark slides with neon accents, optimized for phone screens |
 
 ### Usage
 
 ```bash
 cd src
 python pipeline_tt.py \
-    --model_name_t gpt-4.1 \
+    --model_name_t gemini-2.5-flash \
     --model_name_v gemini-2.5-flash \
     --result_dir ./result/tiktok_out \
     --paper_latex_root /path/to/latex_proj \
     --ref_audio /path/to/ref_audio.wav \
-    --music_path /path/to/background_music.wav \
-    --num_broll 3
+    --music_path /path/to/background_music.wav
 ```
 
 Run individual stages:
 ```bash
-# Stage 1: Generate vertical slides + hook-first script
+# Stage 1: Generate vertical slides + hook-first script + hook image
 python pipeline_tt.py --stage '["1"]' ...
 
-# Stage 2: TTS + silence removal + b-roll generation
+# Stage 2: TTS + silence removal
 python pipeline_tt.py --stage '["2"]' ...
 
-# Stage 3: Visual assembly + audio mixing + final output
+# Stage 3: Visual assembly + audio mixing + subtitles + final output
 python pipeline_tt.py --stage '["3"]' ...
 ```
 
@@ -218,15 +217,14 @@ python pipeline_tt.py --stage '["3"]' ...
 | `--ref_audio` | `str` | `./assets/demo/zeyu.wav` | Reference audio for voice cloning |
 | `--ref_text` | `str` | `None` | Optional transcript of reference audio |
 | `--music_path` | `str` | `None` | Background music file (optional — enables audio ducking) |
-| `--num_broll` | `int` | `3` | Number of procedural b-roll clips to generate |
-| `--tiktok_width` | `int` | `1080` | Output video width |
-| `--tiktok_height` | `int` | `1920` | Output video height |
-| `--stage` | `str` | `'["0"]'` | Stages: `0`=all, `1`=slides+script, `2`=TTS+broll, `3`=visual+audio+final |
+| `--tiktok_width` | `int` | `2160` | Output video width |
+| `--tiktok_height` | `int` | `3840` | Output video height |
+| `--stage` | `str` | `'["0"]'` | Stages: `0`=all, `1`=slides+script, `2`=TTS, `3`=visual+audio+final |
 
 ### Pipeline Architecture
 
 ```
-Paper LaTeX ──> [Vertical Slide Gen] ──> Slide Images (9:16)
+Paper LaTeX ──> [Vertical Slide Gen] ──> Slide Images (9:16, 4K)
                                               │
                                               ▼
                                     [Hook-First Script Gen] ──> Segments
@@ -234,24 +232,24 @@ Paper LaTeX ──> [Vertical Slide Gen] ──> Slide Images (9:16)
                                               ▼
                                       [Jargon Filter]
                                               │
-                              ┌───────────────┼───────────────┐
-                              ▼               ▼               ▼
-                        [TTS + Pace]    [B-Roll Gen]    [Ken Burns Gen]
-                              │               │               │
-                              ▼               ▼               ▼
-                     VO (no pauses)     Abstract clips   Zoomed slides
-                              │               │               │
-                              ▼               └───────┬───────┘
-                     [Music + Ducking]                ▼
-                              │          [3-Second Cut Assembly]
-                              │          + Impact Captions
-                              │                    │
-                              └────────┬───────────┘
-                                       ▼
-                              [Final Mux + Fade-out]
-                                       │
-                                       ▼
-                               tiktok_final.mp4
+                              ┌───────────────┴───────────────┐
+                              ▼                               ▼
+                        [TTS + Pace]                  [Static Slide Assembly]
+                              │                       + AI Hook Image
+                              ▼                               │
+                     VO (no pauses)                           │
+                              │                               │
+                              ▼                               │
+                     [Music + Ducking]                        │
+                              │                               │
+                              └────────────┬──────────────────┘
+                                           ▼
+                                  [Final Mux + Subtitles]
+                                  + Karaoke highlighting
+                                  + Fade-out
+                                           │
+                                           ▼
+                                   tiktok_final.mp4
 ```
 
 ### Module Reference
@@ -260,11 +258,11 @@ Paper LaTeX ──> [Vertical Slide Gen] ──> Slide Images (9:16)
 |------|---------|
 | `src/pipeline_tt.py` | Main orchestrator — 3-stage pipeline |
 | `src/tt_script_gen.py` | Hook-first script generation + jargon filter |
-| `src/tt_visual_engine.py` | Ken Burns, code scroll, impact captions, 3s assembly |
+| `src/tt_visual_engine.py` | Static slide assembly, code scroll, visual timeline |
 | `src/tt_audio_engine.py` | Silence removal, music mixing, audio ducking |
-| `src/broll_manager.py` | Procedural b-roll generation (4 visual styles) |
 | `assets/styles.json` | Color palettes, caption styling, transition config |
 | `src/prompts/slide_beamer_prompt_tt.txt` | Vertical slide generation prompt |
+| `src/prompts/slide_subtitle_cursor_prompt_tt.txt` | Narration script prompt |
 
 ---
 
