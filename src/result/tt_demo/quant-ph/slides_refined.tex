@@ -1,0 +1,114 @@
+\documentclass{beamer}
+
+\usepackage{geometry}
+\geometry{paperwidth=9cm,paperheight=16cm}
+\setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
+\usetheme{Madrid}
+
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\definecolor{accent}{RGB}{0, 180, 255}
+\definecolor{darkbg}{RGB}{20, 20, 30}
+
+\setbeamercolor{frametitle}{bg=darkbg, fg=white}
+\setbeamercolor{background canvas}{bg=darkbg}
+\setbeamercolor{normal text}{fg=white}
+\setbeamercolor{alerted text}{fg=accent}
+\setbeamercolor{itemize item}{fg=accent}
+
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{normal text}{size=\large}
+
+\title{}
+\author{}
+\date{}
+
+
+\setbeamerfont{caption}{size=\scriptsize}
+\begin{document}
+\begin{frame}[plain]
+\vfill
+\centering
+{\Huge\bfseries \alert{Scalable} spin squeezing\\
+\medskip
+on disordered quantum \alert{networks}}
+\vspace{0.5cm}
+
+\textcolor{accent}{\rule{\textwidth}{1pt}}
+\vfill
+\end{frame}
+\begin{frame}{\bfseries The challenge: Robust spin squeezing \\ on inhomogeneous networks}
+
+\vspace{0.3cm}
+\textcolor{accent}{\textbullet} Quantum sensors need \alert{entangled states} for precision beyond classical limits
+
+\textcolor{accent}{\textbullet} Realistic platforms have \alert{disorder and imperfections} affecting correlations
+
+\textcolor{accent}{\textbullet} When and how can scalable squeezing emerge in complex, noisy geometries?
+
+\vfill
+\centering
+\includegraphics[width=0.8\textwidth]{Fig_disordertypes.pdf}
+\vfill
+\end{frame}
+\begin{frame}{\bfseries Method: Rotor-spin-wave theory on graphs}
+
+\vspace{0.3cm}
+\begin{itemize}
+    \item \alert{Key idea:} Model spin dynamics on general interaction networks via \alert{graph Laplacian spectrum}
+    \item Separate dynamics into:
+    \begin{itemize}
+        \item \alert{Zero mode} → collective rotor → OAT-like squeezing
+        \item \alert{Spin-wave excitations} → governed by Laplacian gaps and spectral dimension
+    \end{itemize}
+\end{itemize}
+
+\vfill
+\centering
+\includegraphics[width=0.8\textwidth]{Fig_SpinWaveSpectrum.pdf}
+
+\vfill
+\end{frame}
+\begin{frame}{\bfseries Results: Spectral dimension controls squeezing scaling}
+
+\vspace{0.3cm}
+\centering
+{\Huge \alert{$d\_s > 3$} leads to \alert{OAT-like} squeezing\\[0.2cm]
+\alert{$2 < d\_s < 3$} yields \alert{critical} squeezing\\[0.2cm]
+$d_s < 2$ no scalable squeezing}
+
+\vspace{0.6cm}
+\textcolor{accent}{\rule{\textwidth}{1pt}}
+
+\vspace{0.3cm}
+\begin{itemize}
+\item \alert{Geometric prerequisite:} Existence of a \alert{percolating cluster} in the network
+\item \alert{Disorder} shifts squeezing threshold, but does not affect scaling \alert{universality}
+\item \alert{Spectral dimension} governs dynamic timescales and squeezing minimum scaling exponents
+\end{itemize}
+
+\vfill
+\includegraphics[width=0.8\textwidth]{Fig_SqueezingConditions.pdf}
+
+\vfill
+\end{frame}
+\begin{frame}{\bfseries Takeaway: Universality of scalable squeezing on quantum networks}
+
+\vspace{1cm}
+\centering
+\alert{Spin squeezing scalability is \emph{universal} and fully}\par
+\alert{characterized by spectral dimension \& graph connectivity.}
+
+\vspace{1cm}
+\alert{Disorder-induced critical points result from interplay}\par
+\alert{between percolation and magnetic universality classes.}
+
+\vspace{1cm}
+
+Path forward: Tunable anisotropy \& engineered interactions unlock\par
+scalable metrology even in low-filling, disordered systems.
+
+\vfill
+\end{frame}
+\end{document}

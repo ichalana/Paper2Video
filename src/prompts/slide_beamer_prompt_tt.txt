@@ -1,0 +1,69 @@
+Please generate a complete English presentation based on the given TeX source of a research paper, using LaTeX Beamer in VERTICAL (portrait) format for a short-form video (TikTok/Reels/Shorts).
+
+CRITICAL FORMAT REQUIREMENT:
+The slides MUST be in 9:16 portrait (vertical) orientation. Use this exact preamble:
+\documentclass{beamer}
+\usepackage{geometry}
+\geometry{paperwidth=9cm,paperheight=16cm}
+\setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
+
+This ensures each slide is tall and narrow, optimized for vertical phone screens.
+
+VISUAL DESIGN — MAKE IT LOOK STUNNING:
+- Use \usetheme{Madrid} with custom dark colors (do NOT use metropolis — it is not available).
+- Define a bold, high-contrast color scheme:
+  \definecolor{accent}{RGB}{0, 180, 255}
+  \definecolor{darkbg}{RGB}{20, 20, 30}
+  \setbeamercolor{frametitle}{bg=darkbg, fg=white}
+  \setbeamercolor{background canvas}{bg=darkbg}
+  \setbeamercolor{normal text}{fg=white}
+  \setbeamercolor{alerted text}{fg=accent}
+  \setbeamercolor{itemize item}{fg=accent}
+- Use DARK backgrounds with LIGHT text. This looks far better on phones.
+- Use \alert{} liberally to splash color on key words and numbers.
+- Add colored horizontal rules (\textcolor{accent}{\rule{\textwidth}{1pt}}) between sections for visual rhythm.
+
+Content structure — exactly 5 to 6 slides total (the video is 45-60 seconds):
+
+1. Hook Slide: ONE bold provocative statement about the paper's impact, set in \Huge bold text, centered vertically. Add a thin accent-colored line below it. NO title, NO authors. This must grab attention.
+
+2. Problem Slide: Frame the problem with urgency. Use an icon-style bullet list (\textcolor{accent}{\textbullet}) with 2-3 punchy items (under 8 words each). If the paper has a relevant figure, include it — scaled to fill most of the width (width=0.8\textwidth). Use a short, bold frametitle.
+
+3. Method Slide: Show the key idea. If the paper has a system architecture or pipeline figure, USE IT prominently. Add 1-2 bullet points max explaining the core mechanism. Use \alert{} on the novel components. Figures should be large and centered.
+
+4. Results Slide: Lead with the most impressive number in \Huge \alert{} text (e.g., "\Huge \alert{4x} better"). Follow with 1-2 supporting bullets. If there's a chart or PR curve, include it large. For tables: simplify to 2-3 rows, use \footnotesize, and \alert{} the best numbers.
+
+5. Takeaway Slide: One bold sentence summarizing the contribution. One line on future work or call to action. Keep it sparse — let whitespace breathe.
+
+6. (Optional) Impact Slide: Only if there's a strong real-world application to highlight. One concrete implication in large text.
+
+Typography:
+- Set \setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+- Body text should be \large minimum. Key metrics should be \Huge.
+- Text must be readable on a small phone screen at arm's length.
+- Maximum 3 short bullet points per slide. Fewer is better.
+- Use \vspace{} and \vfill generously to spread content vertically — do NOT cram everything at the top.
+
+Image and figure handling:
+- PREFER FIGURES OVER TEXT on every slide. A slide with one big figure + one bullet is ideal.
+- Use exact filenames from the tex source for all images.
+- Scale images with width=0.8\textwidth or larger.
+- If a figure has subfigures, pick the single most impactful one rather than showing all.
+- For tables: simplify aggressively, max 3-4 rows, use \scriptsize.
+
+Code generation requirements:
+- The generated LaTeX code must be complete and compile directly.
+- Must begin as \documentclass{beamer} and end as \end{document}.
+- Include \usepackage{geometry} for the vertical paper size.
+
+Other instructions:
+- All content must be in English.
+- Summarize aggressively — this is a 45-60 second video, not a full talk.
+- Each slide should take ~8-12 seconds to present verbally.
+- Do NOT use \usepackage{resizebox}.
+- Do NOT use \pdfminorversion or any other pdfTeX-only primitives — tectonic does not support them.
+- Do NOT use \@ifpackageloaded or other internal LaTeX macros to conditionally load themes.
+- Do NOT use the metropolis theme — it is not available.
+- & in titles is not allowed (causes "Misplaced alignment tab character &" error).
+- Pay attention to "error: !File ended while scanning use of \frame".
+Only output *complete* latex code which should be ready to compile using tectonic (simple version of TeX Live). Before output check if the code is grammatically correct.

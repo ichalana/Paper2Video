@@ -1,0 +1,42 @@
+{
+  "colors": {
+    "neon_green": "#39FF14",
+    "cyber_red": "#FF073A",
+    "deep_black": "#0A0A0A",
+    "electric_blue": "#00D4FF",
+    "hot_pink": "#FF10F0",
+    "pure_white": "#FFFFFF"
+  },
+  "impact_caption": {
+    "font_size_ratio": 0.07,
+    "font_color": "#FFFFFF",
+    "stroke_color": "#000000",
+    "stroke_width": 4,
+    "bg_opacity": 0.6,
+    "position_y_ratio": 0.45
+  },
+  "highlight": {
+    "color": "#39FF14",
+    "border_width": 4,
+    "glow_color": "#39FF1488"
+  },
+  "transitions": {
+    "max_segment_duration": 3.0,
+    "crossfade_duration": 0.25,
+    "fade_out_duration": 1.5
+  },
+  "ken_burns": {
+    "zoom_range": [1.0, 1.35],
+    "pan_speed": 0.15
+  },
+  "audio": {
+    "music_volume_normal": 0.25,
+    "music_volume_ducked": 0.08,
+    "duck_attack_ms": 200,
+    "duck_release_ms": 500
+  },
+  "resolution": {
+    "width": 2160,
+    "height": 3840
+  }
+}

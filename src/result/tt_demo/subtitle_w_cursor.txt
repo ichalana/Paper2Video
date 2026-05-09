@@ -1,0 +1,10 @@
+Did you know disorder can kill quantum sensor accuracy? | no
+Quantum sensors rely on super precise entangled states. But real systems are messy and noisy. | no
+###
+We built a method to model spin behavior on complex, random networks. | no
+It splits spins into collective rotations and tiny wave vibrations. | no
+###
+This predicts when quantum advantage survives or fails in disordered setups. | no
+Here’s the wild part: a single number, the spectral dimension, controls the scaling! | no
+If it’s above 3, squeezing is robust and powerful. Below 2? Forget it. | no
+Follow for more mind-blowing physics hits like this! | no

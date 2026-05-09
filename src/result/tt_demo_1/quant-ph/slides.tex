@@ -1,0 +1,174 @@
+\documentclass{beamer}
+\usepackage{geometry}
+\geometry{paperwidth=9cm,paperheight=16cm}
+\setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
+
+\usetheme{Madrid}
+\usecolortheme{spruce}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\definecolor{accent}{RGB}{0, 180, 255}
+\definecolor{darkbg}{RGB}{20, 20, 30}
+\setbeamercolor{frametitle}{bg=darkbg, fg=white}
+\setbeamercolor{background canvas}{bg=darkbg}
+\setbeamercolor{normal text}{fg=white}
+\setbeamercolor{alerted text}{fg=accent}
+\setbeamercolor{itemize item}{fg=accent}
+
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{normal text}{size=\large}
+
+\title{}
+\author{}
+\date{}
+
+\begin{document}
+
+%%%%% 1. HOOK SLIDE %%%%%
+\begin{frame}[plain]
+\vfill
+\centering
+\Huge\bfseries\alert{Scalable spin squeezing \\
+on \\
+complex quantum networks}
+\vfill
+\textcolor{accent}{\rule{\textwidth}{1pt}}
+\vfill
+\end{frame}
+
+%%%%% 2. PROBLEM SLIDE 1 %%%%%
+\begin{frame}
+\frametitle{\bfseries Why scalable spin squeezing matters}
+
+\vfill
+\begin{itemize}
+    \item \textcolor{accent}{\textbullet} Quantum sensing demands \alert{robust} entanglement
+    \item \textcolor{accent}{\textbullet} Real devices suffer from \alert{disorder \& noise}
+    \item \textcolor{accent}{\textbullet} Understanding \alert{network effects} is key to scalability
+\end{itemize}
+\vfill
+\end{frame}
+
+%%%%% 3. PROBLEM SLIDE 2 %%%%%
+\begin{frame}
+\frametitle{\bfseries Real-world impact of disorder}
+
+\vfill
+\centering
+\includegraphics[width=0.8\textwidth]{Fig_disordertypes.pdf}
+
+\vspace{.3cm}
+\large
+\alert{Disorder types in experiments}:
+\begin{itemize}
+\item Site dilution in lattices (ions, Rydberg, molecules)
+\item Engineered graph connectivity (programmable arrays)
+\item Spatially correlated errors in quantum processors
+\end{itemize}
+\vfill
+\end{frame}
+
+%%%%% 4. METHOD SLIDE 1 %%%%%
+\begin{frame}
+\frametitle{\bfseries The key idea: XXZ model on graphs}
+
+\vfill
+\centering
+\includegraphics[width=0.85\textwidth]{Fig_SpinWaveSpectrum.pdf}
+
+\vfill
+\begin{itemize}
+    \item \alert{Spin waves} governed by graph Laplacian spectrum
+    \item Collective \alert{zero mode} acts like \textbf{one-axis twisting} rotor
+\end{itemize}
+\vfill
+\end{frame}
+
+%%%%% 5. METHOD SLIDE 2 %%%%%
+\begin{frame}
+\frametitle{\bfseries Spin squeezing mechanisms}
+
+\vfill
+\centering
+\includegraphics[width=0.9\textwidth]{Fig_conditionhierarchy.pdf}
+
+\vfill
+\tiny
+\vspace{-0.5cm}
+Two distinct routes to \alert{scalable squeezing} governed by \alert{spectral dimension} \(d_s\):
+
+\begin{itemize}
+\item \alert{OAT-like squeezing} for \(d_s > 3\): mean-field rotor dominates dynamics
+\item \alert{Critical squeezing} for \(2 < d_s < 3\): spontaneous symmetry breaking enabled by transient random walks
+\end{itemize}
+\vfill
+\end{frame}
+
+%%%%% 6. RESULTS SLIDE %%%%%
+\begin{frame}
+\frametitle{\bfseries Impressive results: scaling regimes}
+
+\vfill
+\centering
+\Huge \alert{Phase sensitivity scaling beyond shot noise:} \\
+\Huge \alert{$(\delta\phi)^2 \sim N^{-(1+\mu)}$}
+
+\vspace{.4cm}
+\begin{minipage}{0.47\textwidth}
+\includegraphics[width=\textwidth]{Fig_SqueezingConditions.pdf}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\begin{itemize}
+    \item OAT: \(\mu=2/3\), \(\nu=1/3\) scaling, long-range connected graphs
+    \item Critical: finite temperature SSB yields \alert{robust squeezing}
+    \item Disorder shifts \alert{critical anisotropy} \(\Delta_c\), suppressing squeezing
+\end{itemize}
+\end{minipage}
+
+\vfill
+\end{frame}
+
+%%%%% 7. IMPACT SLIDE %%%%%
+\begin{frame}
+\frametitle{\bfseries Towards real quantum sensors}
+
+\vfill
+\centering
+\includegraphics[width=0.85\textwidth]{Fig_examples.png}
+
+\vspace{.3cm}
+\large
+\begin{itemize}
+\item \alert{Trapped ions} --- tunable exponent \& dilution
+\item \alert{Rydberg arrays} --- engineered graphs and cavity control
+\item \alert{Solid-state defects} --- disorder and dipolar interaction
+\end{itemize}
+
+\vfill
+\end{frame}
+
+%%%%% 8. TAKEAWAY SLIDE %%%%%
+\begin{frame}
+\frametitle{\bfseries Takeaway}
+
+\vfill
+\centering
+\Huge \alert{Scalable spin squeezing depends universally on \\ spectral dimension and disorder structure.}
+
+\vspace{0.5cm}
+\large
+\centering
+\alert{Designing quantum networks with} \\
+\alert{spectral dimension \(d\_s > 2\) and strong connectivity} \\
+\alert{is essential for robust quantum metrology.}
+
+\vfill
+\centering
+{\normalsize Towards \alert{scalable quantum sensors} on noisy, complex platforms.}
+
+\vfill
+\end{frame}
+
+\end{document}

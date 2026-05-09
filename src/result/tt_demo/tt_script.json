@@ -1,0 +1,53 @@
+{
+  "raw_script": "Did you know disorder can kill quantum sensor accuracy? | IMPACT: SENSOR RISK\n\nQuantum sensors rely on super precise entangled states. But real systems are messy and noisy. | IMPACT: REALITY CHECK  \n###  \nWe built a method to model spin behavior on complex, random networks. | IMPACT: BREAKTHROUGH  \nIt splits spins into collective rotations and tiny wave vibrations. | IMPACT: HOW IT WORKS  \n###  \nThis predicts when quantum advantage survives or fails in disordered setups. | IMPACT: GAME CHANGER\n\nHere\u2019s the wild part: a single number, the spectral dimension, controls the scaling! | IMPACT: 3 OR NOTHING  \nIf it\u2019s above 3, squeezing is robust and powerful. Below 2? Forget it. | IMPACT: THRESHOLD  \nFollow for more mind-blowing physics hits like this! | IMPACT: FOLLOW NOW",
+  "segments": [
+    {
+      "phase": "hook",
+      "text": "Did you know disorder can kill quantum sensor accuracy?",
+      "impact_text": "SENSOR RISK",
+      "slide_idx": 0
+    },
+    {
+      "phase": "hook",
+      "text": "Quantum sensors rely on super precise entangled states. But real systems are messy and noisy.",
+      "impact_text": "REALITY CHECK",
+      "slide_idx": 0
+    },
+    {
+      "phase": "hook",
+      "text": "We built a method to model spin behavior on complex, random networks.",
+      "impact_text": "BREAKTHROUGH",
+      "slide_idx": 1
+    },
+    {
+      "phase": "hook",
+      "text": "It splits spins into collective rotations and tiny wave vibrations.",
+      "impact_text": "HOW IT WORKS",
+      "slide_idx": 1
+    },
+    {
+      "phase": "hook",
+      "text": "This predicts when quantum advantage survives or fails in disordered setups.",
+      "impact_text": "GAME CHANGER",
+      "slide_idx": 2
+    },
+    {
+      "phase": "hook",
+      "text": "Here\u2019s the wild part: a single number, the spectral dimension, controls the scaling!",
+      "impact_text": "3 OR NOTHING",
+      "slide_idx": 2
+    },
+    {
+      "phase": "hook",
+      "text": "If it\u2019s above 3, squeezing is robust and powerful. Below 2? Forget it.",
+      "impact_text": "THRESHOLD",
+      "slide_idx": 2
+    },
+    {
+      "phase": "hook",
+      "text": "Follow for more mind-blowing physics hits like this!",
+      "impact_text": "FOLLOW NOW",
+      "slide_idx": 2
+    }
+  ]
+}

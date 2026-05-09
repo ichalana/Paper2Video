@@ -1,0 +1,53 @@
+\documentclass{beamer}
+
+\usepackage{geometry}
+\geometry{paperwidth=9cm,paperheight=16cm}
+\setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
+
+\usetheme{Madrid}
+\usecolortheme{spruce}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\definecolor{accent}{RGB}{0, 180, 255}
+\definecolor{darkbg}{RGB}{20, 20, 30}
+\setbeamercolor{frametitle}{bg=darkbg, fg=white}
+\setbeamercolor{background canvas}{bg=darkbg}
+\setbeamercolor{normal text}{fg=white}
+\setbeamercolor{alerted text}{fg=accent}
+\setbeamercolor{itemize item}{fg=accent}
+
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{normal text}{size=\large}
+
+\title{}
+\author{}
+\date{}
+
+
+\setbeamerfont{caption}{size=\scriptsize}
+\begin{document}
+\begin{frame}
+\frametitle{\bfseries Impressive results: scaling regimes}
+
+\vfill
+\centering
+\Huge \alert{Phase sensitivity scaling beyond shot noise:} \\
+\Huge \alert{$(\delta\phi)^2 \sim N^{-(1+\mu)}$}
+
+\vspace{.4cm}
+\begin{minipage}{0.47\textwidth}
+\includegraphics[width=1\textwidth]{Fig_SqueezingConditions.pdf}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\begin{itemize}
+    \item OAT: \(\mu=2/3\), \(\nu=1/3\) scaling, long-range connected graphs
+    \item Critical: finite temperature SSB yields \alert{robust squeezing}
+    \item Disorder shifts \alert{critical anisotropy} \(\Delta_c\), suppressing squeezing
+\end{itemize}
+\end{minipage}
+
+\vfill
+\end{frame}
+\end{document}

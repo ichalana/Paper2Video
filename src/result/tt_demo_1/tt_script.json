@@ -1,0 +1,83 @@
+{
+  "raw_script": "=== HOOK ===  \nWhat if the future of quantum sensors depends on the hidden network inside them? | IMPACT: QUANTUM FUTURE  \nAnd what if disorder and noise aren't bugs \u2014 they\u2019re clues that unlock scalability? | IMPACT: GAME CHANGER  \n\n=== NARRATIVE ===  \nQuantum sensors need super-strong entanglement to beat classical limits \u2014 but real devices are noisy and messy. | IMPACT: NOISE PROBLEM  \nThat noise ruins scaling, meaning bigger networks don\u2019t always mean better performance. | IMPACT: PERSONAL RISK  \n###  \nResearchers built a new approach studying spin squeezing on complex quantum networks with different types of disorder \u2014 site dilution, engineered connectivity, and long-range correlated errors. | IMPACT: INNOVATION  \nThey focused on how spin waves behave on these graphs, tracking a \u201czero mode\u201d that acts like a twisting rotor \u2014 a neat trick to maintain coherence. | IMPACT: MECHANISM  \n###  \nThis lets them map how disorder\u2019s shape and strength control squeezing, creating two possible routes: critical squeezing with symmetry breaking or OAT-like squeezing dominated by a collective rotor. | IMPACT: UNIQUE  \nThink of it like tuning a community\u2019s connections to keep everyone in sync despite chaos \u2014 pretty wild, right? | IMPACT: ANALOGY  \n###  \nNow comes the payoff: their framework predicts when large-scale, robust squeezing is possible even in messy, real-world quantum devices. | IMPACT: BREAKTHROUGH  \n\n=== FLEX ===  \nThey found phase sensitivity scaling beyond shot noise \u2014 a 2/3 power law scaling in long-range connected networks! | IMPACT: SCALING POWER  \nWith trapped ions, Rydberg arrays, and solid-state defects, they can now engineer disorder and connectivity to build scalable quantum sensors. | IMPACT: REAL-WORLD  \nThis means we\u2019re closer than ever to quantum sensors that work reliably in noisy, complex environments \u2014 a huge step for precision measurement. | IMPACT: IMPACT  \nFollow for more quantum breakthroughs you need to know! | IMPACT: FOLLOW NOW",
+  "segments": [
+    {
+      "phase": "hook",
+      "text": "What if the future of quantum sensors depends on the hidden network inside them?",
+      "impact_text": "QUANTUM FUTURE",
+      "slide_idx": 0
+    },
+    {
+      "phase": "hook",
+      "text": "And what if disorder and noise aren't bugs \u2014 they\u2019re clues that unlock scalability?",
+      "impact_text": "GAME CHANGER",
+      "slide_idx": 0
+    },
+    {
+      "phase": "narrative",
+      "text": "Quantum sensors need super-strong entanglement to beat classical limits \u2014 but real devices are noisy and messy.",
+      "impact_text": "NOISE PROBLEM",
+      "slide_idx": 0
+    },
+    {
+      "phase": "narrative",
+      "text": "That noise ruins scaling, meaning bigger networks don\u2019t always mean better performance.",
+      "impact_text": "PERSONAL RISK",
+      "slide_idx": 0
+    },
+    {
+      "phase": "narrative",
+      "text": "Researchers built a new approach studying spin squeezing on complex quantum networks with different types of disorder \u2014 site dilution, engineered connectivity, and long-range correlated errors.",
+      "impact_text": "INNOVATION",
+      "slide_idx": 1
+    },
+    {
+      "phase": "narrative",
+      "text": "They focused on how spin waves behave on these graphs, tracking a \u201czero mode\u201d that acts like a twisting rotor \u2014 a neat trick to maintain coherence.",
+      "impact_text": "MECHANISM",
+      "slide_idx": 1
+    },
+    {
+      "phase": "narrative",
+      "text": "This lets them map how disorder\u2019s shape and strength control squeezing, creating two possible routes: critical squeezing with symmetry breaking or OAT-like squeezing dominated by a collective rotor.",
+      "impact_text": "UNIQUE",
+      "slide_idx": 2
+    },
+    {
+      "phase": "narrative",
+      "text": "Think of it like tuning a community\u2019s connections to keep everyone in sync despite chaos \u2014 pretty wild, right?",
+      "impact_text": "ANALOGY",
+      "slide_idx": 2
+    },
+    {
+      "phase": "narrative",
+      "text": "Now comes the payoff: their framework predicts when large-scale, robust squeezing is possible even in messy, real-world quantum devices.",
+      "impact_text": "BREAKTHROUGH",
+      "slide_idx": 3
+    },
+    {
+      "phase": "flex",
+      "text": "They found phase sensitivity scaling beyond shot noise \u2014 a 2/3 power law scaling in long-range connected networks!",
+      "impact_text": "SCALING POWER",
+      "slide_idx": 3
+    },
+    {
+      "phase": "flex",
+      "text": "With trapped ions, Rydberg arrays, and solid-state defects, they can now engineer disorder and connectivity to build scalable quantum sensors.",
+      "impact_text": "REAL-WORLD",
+      "slide_idx": 3
+    },
+    {
+      "phase": "flex",
+      "text": "This means we\u2019re closer than ever to quantum sensors that work reliably in noisy, complex environments \u2014 a huge step for precision measurement.",
+      "impact_text": "IMPACT",
+      "slide_idx": 3
+    },
+    {
+      "phase": "flex",
+      "text": "Follow for more quantum breakthroughs you need to know!",
+      "impact_text": "FOLLOW NOW",
+      "slide_idx": 3
+    }
+  ]
+}
