@@ -47,6 +47,7 @@ Check out more examples at [🌐 project page](https://showlab.github.io/Paper2V
 
 ## 🔥 Update
 **Any contributions are welcome!**
+- [x] [2026.5.4] New **High-Retention TikTok Pipeline** (`pipeline_tt.py`) — generates viral-style vertical videos with hook-first scripting, 3-second visual cuts, Ken Burns effects, procedural b-roll, impact captions, background music with audio ducking, and jargon filtering.
 - [x] [2025.10.15] We update a new version without talking-head for fast generation!
 - [x] [2025.10.11] Our work receives attention on [YC Hacker News](https://news.ycombinator.com/item?id=45553701).
 - [x] [2025.10.9] Thanks AK for sharing our work on [Twitter](https://x.com/_akhaliq/status/1976099830004072849)!
@@ -70,6 +71,7 @@ https://github.com/user-attachments/assets/a655e3c7-9d76-4c48-b946-1068fdb6cdd9
   - [1. Requirements](#1-requirements)
   - [2. Configure LLMs](#2-configure-llms)
   - [3. Inference](#3-inference)
+- [🎬 TikTok Pipeline](#-tiktok-pipeline)
 - [📊 Evaluation: Paper2Video](#-evaluation-paper2video)
 - [😼 Fun: Paper2Video for Paper2Video](#-fun-paper2video-for-paper2video)
 - [🙏 Acknowledgements](#-acknowledgements)
@@ -158,6 +160,112 @@ python pipeline_light.py --stage "[\"3\"]" ...
 | `--gpu_list` | `list[int]` | `[]` | GPU indices for cursor generation (e.g. `0,1`) |
 | `--if_tree_search` | `bool` | `True` | Enable VLM-based layout refinement for slides |
 | `--stage` | `str` | `"[\"0\"]"` | Stages to run: `0`=all, `1`=slides, `2`=speech+cursor, `3`=merge |
+
+---
+
+## 🎬 TikTok Pipeline
+
+Generate high-retention vertical videos (9:16, ~45s) optimized for TikTok, Reels, and Shorts. The pipeline produces viral-style content from academic papers with no manual editing.
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Hook-First Scripting** | 3-part structure: Hook (0-3s) / Narrative (3-30s) / Flex (30-45s) — opens with a provocative claim, not a title slide |
+| **Jargon Filter** | Auto-replaces academic phrasing ("our methodology leverages...") with punchy alternatives ("we built a system that uses...") |
+| **3-Second Cut Rule** | No visual stays on screen for more than 3 seconds — cycles through Ken Burns effects, b-roll, and code-scroll animations |
+| **Ken Burns Effects** | 6 zoom/pan presets applied to slide images (zoom-in, pan top-to-bottom, etc.) for dynamic movement |
+| **Procedural B-Roll** | FFmpeg-generated abstract tech visuals (mandelbrot zooms, plasma gradients, digital glitch, waveforms) |
+| **Impact Captions** | Bold 1-3 word captions burned into frames ("4X BETTER", "GAME OVER") |
+| **Audio Ducking** | Background music auto-lowers when voiceover is active via sidechain compression |
+| **Breathless Pacing** | Silence removal from TTS for fast-paced, no-pause delivery |
+| **Readability Guard** | Dense figures with small text are auto-replaced with b-roll |
+
+### Usage
+
+```bash
+cd src
+python pipeline_tt.py \
+    --model_name_t gpt-4.1 \
+    --model_name_v gemini-2.5-flash \
+    --result_dir ./result/tiktok_out \
+    --paper_latex_root /path/to/latex_proj \
+    --ref_audio /path/to/ref_audio.wav \
+    --music_path /path/to/background_music.wav \
+    --num_broll 3
+```
+
+Run individual stages:
+```bash
+# Stage 1: Generate vertical slides + hook-first script
+python pipeline_tt.py --stage '["1"]' ...
+
+# Stage 2: TTS + silence removal + b-roll generation
+python pipeline_tt.py --stage '["2"]' ...
+
+# Stage 3: Visual assembly + audio mixing + final output
+python pipeline_tt.py --stage '["3"]' ...
+```
+
+### TikTok Pipeline Arguments
+
+| Argument | Type | Default | Description |
+|----------|------|---------|-------------|
+| `--model_name_t` | `str` | `gpt-4.1` | LLM for slide generation |
+| `--model_name_v` | `str` | `gpt-4.1` | VLM for script generation |
+| `--result_dir` | `str` | `./result/tiktok_out` | Output directory |
+| `--paper_latex_root` | `str` | `./assets/demo/latex_proj` | LaTeX paper project directory |
+| `--ref_audio` | `str` | `./assets/demo/zeyu.wav` | Reference audio for voice cloning |
+| `--ref_text` | `str` | `None` | Optional transcript of reference audio |
+| `--music_path` | `str` | `None` | Background music file (optional — enables audio ducking) |
+| `--num_broll` | `int` | `3` | Number of procedural b-roll clips to generate |
+| `--tiktok_width` | `int` | `1080` | Output video width |
+| `--tiktok_height` | `int` | `1920` | Output video height |
+| `--stage` | `str` | `'["0"]'` | Stages: `0`=all, `1`=slides+script, `2`=TTS+broll, `3`=visual+audio+final |
+
+### Pipeline Architecture
+
+```
+Paper LaTeX ──> [Vertical Slide Gen] ──> Slide Images (9:16)
+                                              │
+                                              ▼
+                                    [Hook-First Script Gen] ──> Segments
+                                              │                (hook/narrative/flex)
+                                              ▼
+                                      [Jargon Filter]
+                                              │
+                              ┌───────────────┼───────────────┐
+                              ▼               ▼               ▼
+                        [TTS + Pace]    [B-Roll Gen]    [Ken Burns Gen]
+                              │               │               │
+                              ▼               ▼               ▼
+                     VO (no pauses)     Abstract clips   Zoomed slides
+                              │               │               │
+                              ▼               └───────┬───────┘
+                     [Music + Ducking]                ▼
+                              │          [3-Second Cut Assembly]
+                              │          + Impact Captions
+                              │                    │
+                              └────────┬───────────┘
+                                       ▼
+                              [Final Mux + Fade-out]
+                                       │
+                                       ▼
+                               tiktok_final.mp4
+```
+
+### Module Reference
+
+| File | Purpose |
+|------|---------|
+| `src/pipeline_tt.py` | Main orchestrator — 3-stage pipeline |
+| `src/tt_script_gen.py` | Hook-first script generation + jargon filter |
+| `src/tt_visual_engine.py` | Ken Burns, code scroll, impact captions, 3s assembly |
+| `src/tt_audio_engine.py` | Silence removal, music mixing, audio ducking |
+| `src/broll_manager.py` | Procedural b-roll generation (4 visual styles) |
+| `assets/styles.json` | Color palettes, caption styling, transition config |
+| `src/prompts/slide_beamer_prompt_tt.txt` | Vertical slide generation prompt |
+
 ---
 
 ## 📊 Evaluation: Paper2Video

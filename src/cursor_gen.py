@@ -38,6 +38,19 @@ def parse_script(script_text):
         result.append(page_data)
     return result
 
+def clean_cursor_instruction(instruction):
+    """Extract the actual text/element to find from a cursor prompt like 'cursor on "some text" red text'."""
+    # Extract quoted text if present
+    quoted = re.findall(r'["\u201c\u201d]([^"\u201c\u201d]+)["\u201c\u201d]', instruction)
+    if quoted:
+        return quoted[0]
+    # Strip common prefixes
+    cleaned = re.sub(r'^cursor\s+(on|at|near)\s+', '', instruction, flags=re.IGNORECASE)
+    # Strip style suffixes like "red text", "bold text"
+    cleaned = re.sub(r'\s+(red|bold|italic|blue|highlighted?)\s+(text|font)\s*$', '', cleaned, flags=re.IGNORECASE)
+    return cleaned.strip() or instruction
+
+
 def infer_cursor_gemini(instruction, image_path, agent):
     """Use Gemini VLM to find cursor position for the given instruction in the slide image."""
     import time
@@ -45,11 +58,15 @@ def infer_cursor_gemini(instruction, image_path, agent):
     orig_h, orig_w = ori_image.shape[:2]
 
     pil_image = Image.open(image_path)
+    target_text = clean_cursor_instruction(instruction)
     prompt = (
-        f"This is a presentation slide (size: {orig_w}x{orig_h} pixels). "
-        f"Find the location of '{instruction}' in the slide. "
-        f"Respond with only pixel coordinates in this exact format: click(x, y) "
-        f"where x is the horizontal pixel (0 to {orig_w}) and y is the vertical pixel (0 to {orig_h})."
+        f"Look at this presentation slide image carefully. The image is {orig_w} pixels wide and {orig_h} pixels tall. "
+        f"Find the exact pixel location of the text or element: \"{target_text}\"\n"
+        f"Scan the slide visually and locate where this text appears. "
+        f"Return the CENTER of that text as pixel coordinates.\n"
+        f"Respond with ONLY: click(x, y)\n"
+        f"where x is between 0 and {orig_w}, y is between 0 and {orig_h}. "
+        f"Top-left corner is (0, 0), bottom-right is ({orig_w}, {orig_h})."
     )
     message = BaseMessage.make_user_message(
         role_name="user", content=prompt, image_list=[pil_image], meta_dict={}

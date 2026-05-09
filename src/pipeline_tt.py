@@ -1,24 +1,26 @@
-'''
-TikTok-format Paper2Video Pipeline
-Produces a vertical (9:16, 1080x1920) ~60-second video suitable for TikTok/Reels/Shorts.
+"""
+High-Retention TikTok Paper2Video Pipeline
+==========================================
 
-Steps:
-    1. (LLM)  Slide generation  — limited to --max_slides slides
-    2. (VLM)  Subtitle + cursor prompt generation
-    3. TTS -> audio;  WhisperX grounding -> cursor positions
-    4. Merge slides + audio + cursor + subtitles
-    5. TikTok reformat: pad/blur to 9:16 vertical, speed up to fit --max_duration
-'''
+Generates a vertical (9:16, 1080x1920) ~45-second video designed for maximum
+retention on TikTok/Reels/Shorts.
+
+Architecture:
+  1. Slide Generation  — vertical 9:16 beamer slides (hook-first, visual-heavy)
+  2. Script Generation — 3-part structure: Hook (0-3s) / Narrative (3-30s) / Flex (30-45s)
+  3. Jargon Filter     — converts academic language to punchy social media style
+  4. TTS + Pacing      — breathless voiceover with silence removal
+  5. Visual Assembly   — 3-second cut rule, Ken Burns, b-roll, code scroll, impact captions
+  6. Audio Mixing      — background music with voice-triggered ducking
+  7. Final Mux         — video + audio with fade-out
+"""
 
 import cv2
-import pdb
 import json
 import time
-import shutil
-import asyncio
-import os, sys
+import re
+import os
 import argparse
-import subprocess
 from os import path
 from dotenv import load_dotenv
 from pdf2image import convert_from_path
@@ -26,23 +28,22 @@ from pdf2image import convert_from_path
 load_dotenv(dotenv_path=path.join(path.dirname(path.dirname(path.abspath(__file__))), '.env'))
 
 from speech_gen import tts_per_slide
-from subtitle_render import add_subtitles
-from cursor_gen import cursor_gen_per_sentence
 from slide_code_gen_select_improvement import latex_code_gen_upgrade
-from cursor_render import render_video_with_cursor_from_json
-from subtitle_cursor_prompt_gen import subtitle_cursor_gen
-
 from wei_utils import get_agent_config
+
+from subtitle_render import add_subtitles
+from tt_script_gen import generate_tt_script, segments_to_tts_script
+from tt_visual_engine import assemble_visual_timeline, load_styles
+from tt_audio_engine import (
+    remove_pauses_batch, concatenate_audio, mix_with_music,
+    mix_without_music, get_segment_durations, mux_video_audio,
+)
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 def link_latex_proj(src_dir, dst_dir):
-    """
-    Create a working directory at dst_dir that symlinks every file/subdir
-    from src_dir. Generated files (slides.tex, etc.) go into dst_dir without
-    duplicating the original assets.
-    """
+    """Symlink source latex project into a working directory."""
     src_dir = os.path.abspath(src_dir)
     if not os.path.exists(src_dir):
         raise FileNotFoundError(f"no such dir: {src_dir}")
@@ -60,163 +61,140 @@ def str2list(s):
     return [int(x) for x in s.split(',')]
 
 
-def get_video_duration(video_path: str) -> float:
-    """Get video duration in seconds using ffprobe."""
-    cmd = [
-        "ffprobe", "-v", "error",
-        "-show_entries", "format=duration",
-        "-of", "default=noprint_wrappers=1:nokey=1",
-        video_path,
-    ]
-    result = subprocess.run(cmd, text=True, capture_output=True)
-    return float(result.stdout.strip())
+def generate_hook_image(segments: list[dict], result_dir: str, width: int = 1080, height: int = 1920) -> str:
+    """
+    Use OpenAI image generation to create a visually striking hook image
+    based on the paper's topic extracted from the script segments.
+    """
+    from openai import OpenAI
+
+    # Build a prompt from the hook + first narrative segments
+    topic_lines = []
+    for seg in segments:
+        topic_lines.append(seg["text"])
+        if len(topic_lines) >= 3:
+            break
+    topic = " ".join(topic_lines)
+
+    prompt = (
+        f"Create a visually striking, futuristic digital illustration for a research paper about: {topic}. "
+        f"Style: dark background, neon accents, abstract tech aesthetic. "
+        f"NO text, NO words, NO letters, NO human faces. "
+        f"Cinematic, high contrast, suitable as a vertical phone wallpaper."
+    )
+
+    hook_path = path.join(result_dir, "hook_image.png")
+    print(f"[TT] Generating hook image via OpenAI...")
+    print(f"[TT] Prompt: {prompt[:120]}...")
+
+    try:
+        from dotenv import load_dotenv as _ld
+        _ld()
+
+        client = OpenAI()
+        response = client.images.generate(
+            model="dall-e-3",
+            prompt=prompt,
+            size="1024x1792",
+            quality="standard",
+            n=1,
+        )
+        image_url = response.data[0].url
+        print(f"[TT] Image URL received, downloading...")
+
+        # Download the image
+        import urllib.request
+        urllib.request.urlretrieve(image_url, hook_path)
+
+        # Resize to exact target resolution
+        img = cv2.imread(hook_path)
+        if img is not None:
+            resized = cv2.resize(img, (width, height), interpolation=cv2.INTER_LANCZOS4)
+            cv2.imwrite(hook_path, resized)
+
+        print(f"[TT] Hook image saved: {hook_path}")
+        return hook_path
+
+    except Exception as e:
+        print(f"[TT] Hook image generation failed: {e}")
+        print("[TT] Falling back to first slide for hook visual")
+        return ""
 
 
-def build_atempo_chain(speed: float) -> str:
-    """Build chained atempo filters since each atempo is limited to [0.5, 2.0]."""
-    filters = []
-    remaining = speed
-    while remaining > 2.0:
-        filters.append("atempo=2.0")
-        remaining /= 2.0
-    filters.append(f"atempo={remaining:.4f}")
-    return ",".join(filters)
-
-
-def trim_slides_to_budget(slide_image_dir: str, max_slides: int):
-    """Keep only the first max_slides slide images; remove the rest."""
+def resize_slides(slide_image_dir, width=1080, height=1920):
+    """Resize all slide PNGs to exact target resolution."""
     imgs = sorted(
         [f for f in os.listdir(slide_image_dir) if f.endswith('.png')],
         key=lambda x: int(os.path.splitext(x)[0])
     )
-    for fname in imgs[max_slides:]:
-        os.remove(path.join(slide_image_dir, fname))
-    kept = min(len(imgs), max_slides)
-    print(f"[TikTok] Using {kept} slides (limit: {max_slides})")
-    return kept
-
-
-def tiktok_reformat(
-    input_video: str,
-    output_video: str,
-    width: int = 1080,
-    height: int = 1920,
-    max_duration: float = 60.0,
-    max_speedup: float = 1.75,
-):
-    """
-    Convert a landscape video to TikTok vertical format (default 1080x1920):
-      - Blurred full-screen background
-      - Clear original video centered (scaled to fit width)
-      - If video exceeds max_duration, speed it up (capped at max_speedup)
-    Uses ffmpeg via subprocess.
-    """
-    duration = get_video_duration(input_video)
-    speed = 1.0
-    if duration > max_duration:
-        speed = min(duration / max_duration, max_speedup)
-    print(f"[TikTok] Input duration: {duration:.1f}s, target: {max_duration:.1f}s, speed: {speed:.2f}x")
-
-    blur_amount = 20
-    scale_w = width
-
-    # Video filter: reformat to vertical, then speed up if needed
-    speed_filter = f",setpts=PTS/{speed:.4f}" if speed > 1.0 else ""
-    filtergraph = (
-        f"[0:v]split=2[bg_raw][fg_raw];"
-        f"[bg_raw]scale={width}:{height}:force_original_aspect_ratio=increase,"
-        f"crop={width}:{height},"
-        f"boxblur={blur_amount}:5{speed_filter}[bg];"
-        f"[fg_raw]scale={scale_w}:-2{speed_filter}[fg];"
-        f"[bg][fg]overlay=(W-w)/2:(H-h)/2[outv]"
-    )
-
-    # Audio filter: speed up to match
-    if speed > 1.0:
-        audio_filter = build_atempo_chain(speed)
-        audio_opts = ["-filter:a", audio_filter]
-    else:
-        audio_opts = []
-
-    cmd = [
-        "ffmpeg", "-y",
-        "-i", input_video,
-        "-filter_complex", filtergraph,
-        "-map", "[outv]",
-        "-map", "0:a",
-        *audio_opts,
-        "-c:v", "libx264",
-        "-c:a", "aac",
-        "-shortest",
-        output_video,
-    ]
-    print("[TikTok] Reformatting to vertical:", " ".join(cmd))
-    result = subprocess.run(cmd, text=True, capture_output=True)
-    if result.returncode != 0:
-        print("[TikTok] ffmpeg stderr:", result.stderr)
-        raise RuntimeError("ffmpeg reformat failed")
-    final_dur = get_video_duration(output_video)
-    print(f"[TikTok] Output written to {output_video} ({final_dur:.1f}s)")
+    for fname in imgs:
+        fpath = path.join(slide_image_dir, fname)
+        img = cv2.imread(fpath)
+        resized = cv2.resize(img, (width, height), interpolation=cv2.INTER_LANCZOS4)
+        cv2.imwrite(fpath, resized)
+    print(f"[TT] Resized {len(imgs)} slides to {width}x{height}")
 
 
 # ── main ─────────────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Paper2Video TikTok Pipeline')
-    parser.add_argument('--result_dir',              type=str,       default='./result/zeyu_tt')
+    parser = argparse.ArgumentParser(description='Paper2Video — High-Retention TikTok Pipeline')
+    parser.add_argument('--result_dir',              type=str,       default='./result/tiktok_out')
     parser.add_argument('--model_name_t',            type=str,       default='gpt-4.1')
     parser.add_argument('--model_name_v',            type=str,       default='gpt-4.1')
     parser.add_argument('--paper_latex_root',        type=str,       default='./assets/demo/latex_proj')
-    parser.add_argument('--ref_img',                 type=str,       default='./assets/demo/zeyu.png')
     parser.add_argument('--ref_audio',               type=str,       default='./assets/demo/zeyu.wav')
     parser.add_argument('--ref_text',                type=str,       default=None)
     parser.add_argument('--gpu_list',                type=str2list,  default="")
     parser.add_argument('--if_tree_search',          type=bool,      default=True)
     parser.add_argument('--beamer_templete_prompt',  type=str,       default=None)
     parser.add_argument('--stage',                   type=str,       default='["0"]')
-    # slide+subtitle: 1;  tts+cursor: 2;  merge+tiktok: 3;  all: 0
-    parser.add_argument('--max_slides',  type=int,   default=4,
-                        help='Max slides to keep (fewer slides = less speedup needed)')
-    parser.add_argument('--max_duration', type=float, default=60.0,
-                        help='Target duration; video is sped up to fit (max 1.75x)')
-    parser.add_argument('--max_speedup', type=float, default=1.5,
-                        help='Max playback speedup factor (default 1.5x)')
-    parser.add_argument('--tiktok_width',  type=int,  default=1080)
-    parser.add_argument('--tiktok_height', type=int,  default=1920)
+    # Stages: slide+script: 1 | tts+audio: 2 | visual+final: 3 | all: 0
+    parser.add_argument('--tiktok_width',  type=int,  default=2160)
+    parser.add_argument('--tiktok_height', type=int,  default=3840)
+    parser.add_argument('--music_path',    type=str,   default=None,
+                        help='Path to background music file (e.g., assets/carti.wav)')
     args = parser.parse_args()
     stage = json.loads(args.stage)
-    print("start", "stage:", stage, "gpu_list:", args.gpu_list)
+    print("[TT] Starting high-retention pipeline")
+    print(f"     Stages: {stage}, Resolution: {args.tiktok_width}x{args.tiktok_height}")
 
-    cursor_img_path = "./src/cursor_image/red.png"
     os.makedirs(args.result_dir, exist_ok=True)
+    styles = load_styles()
     agent_config_t = get_agent_config(args.model_name_t)
     agent_config_v = get_agent_config(args.model_name_v)
-    # Create a working dir with symlinks to the original latex project —
-    # the tex compiler needs figures alongside the .tex, but we avoid copying.
+
+    # Set up latex working directory
     latex_work_dir = path.join(args.result_dir, path.basename(args.paper_latex_root))
     link_latex_proj(args.paper_latex_root, latex_work_dir)
     args.paper_latex_root = latex_work_dir
 
-    if path.exists(path.join(args.result_dir, "sat.json")):
-        with open(path.join(args.result_dir, "sat.json"), 'r') as f:
-            time_second = json.load(f)
-    else:
-        time_second = {}
+    # Load timing/token logs
+    sat_path = path.join(args.result_dir, "sat.json")
+    tok_path = path.join(args.result_dir, "token.json")
+    time_second = json.load(open(sat_path)) if path.exists(sat_path) else {}
+    token_usage = json.load(open(tok_path)) if path.exists(tok_path) else {}
 
-    if path.exists(path.join(args.result_dir, "token.json")):
-        with open(path.join(args.result_dir, "token.json"), 'r') as f:
-            token_usage = json.load(f)
-    else:
-        token_usage = {}
+    # Paths
+    slide_latex_path = path.join(args.paper_latex_root, "slides.tex")
+    slide_image_dir  = path.join(args.result_dir, 'slide_imgs')
+    script_save_path = path.join(args.result_dir, 'tt_script.json')
+    tts_script_path  = path.join(args.result_dir, 'subtitle_w_cursor.txt')
+    speech_save_dir  = path.join(args.result_dir, 'audio')
+    paced_audio_dir  = path.join(args.result_dir, 'audio_paced')
+    hook_image_path  = path.join(args.result_dir, 'hook_image.png')
+    visual_work_dir  = path.join(args.result_dir, 'visual_work')
+    tiktok_out       = path.join(args.result_dir, 'tiktok_final.mp4')
 
-    # ── Step 1: Slide Generation ─────────────────────────────────────────────
-    slide_latex_path  = path.join(args.paper_latex_root, "slides.tex")
-    slide_image_dir   = path.join(args.result_dir, 'slide_imgs')
-    os.makedirs(slide_image_dir, exist_ok=True)
-
-    start_time = time.time()
+    # ═══════════════════════════════════════════════════════════════════════
+    # STAGE 1: Slide Generation + Script Generation
+    # ═══════════════════════════════════════════════════════════════════════
     if "1" in stage or "0" in stage:
-        prompt_path = "./src/prompts/slide_beamer_prompt.txt"
+        os.makedirs(slide_image_dir, exist_ok=True)
+
+        # ── 1a: Generate vertical beamer slides ──────────────────────────
+        t0 = time.time()
+        prompt_path = "./src/prompts/slide_beamer_prompt_tt.txt"
         if args.if_tree_search:
             usage_slide, beamer_path = latex_code_gen_upgrade(
                 prompt_path=prompt_path,
@@ -239,118 +217,162 @@ if __name__ == '__main__':
         slide_imgs = convert_from_path(beamer_path, dpi=400)
         for i, img in enumerate(slide_imgs):
             img.save(path.join(slide_image_dir, f"{i+1}.png"))
+        resize_slides(slide_image_dir, args.tiktok_width, args.tiktok_height)
 
-        # ── TikTok: trim to max_slides ──
-        trim_slides_to_budget(slide_image_dir, args.max_slides)
+        token_usage.setdefault(args.model_name_t, []).append(usage_slide)
+        time_second["slide_gen"] = [time.time() - t0]
+        print(f"[TT] Slide generation: {time_second['slide_gen'][0]:.1f}s")
 
-        if args.model_name_t not in token_usage:
-            token_usage[args.model_name_t] = [usage_slide]
-        else:
-            token_usage[args.model_name_t].append(usage_slide)
-        step1_time = time.time()
-        time_second["slide_gen"] = [step1_time - start_time]
-        print("Slide Generation", step1_time - start_time)
+        # ── 1b: Generate hook-first TikTok script ────────────────────────
+        t0 = time.time()
+        segments, raw_script, usage_script = generate_tt_script(slide_image_dir, agent_config_v)
 
-    # ── Step 2: Subtitle + Cursor Prompt Generation ──────────────────────────
-    start_time = time.time()
-    subtitle_cursor_save_path = path.join(args.result_dir, 'subtitle_w_cursor.txt')
-    cursor_save_path           = path.join(args.result_dir, 'cursor.json')
-    speech_save_dir            = path.join(args.result_dir, 'audio')
+        # Save raw script + parsed segments
+        with open(script_save_path, 'w') as f:
+            json.dump({
+                "raw_script": raw_script,
+                "segments": segments,
+            }, f, indent=2)
 
+        # Convert to TTS format (###-delimited)
+        tts_text = segments_to_tts_script(segments)
+        with open(tts_script_path, 'w') as f:
+            f.write(tts_text)
+
+        token_usage.setdefault(args.model_name_v, []).append(usage_script)
+        time_second["script_gen"] = [time.time() - t0]
+        print(f"[TT] Script generation: {time_second['script_gen'][0]:.1f}s")
+        print(f"     {len(segments)} segments: "
+              f"{sum(1 for s in segments if s['phase']=='hook')} hook / "
+              f"{sum(1 for s in segments if s['phase']=='narrative')} narrative / "
+              f"{sum(1 for s in segments if s['phase']=='flex')} flex")
+
+        # ── 1c: Generate AI hook image ───────────────────────────────────
+        t0 = time.time()
+        hook_image_path = generate_hook_image(
+            segments, args.result_dir,
+            width=args.tiktok_width, height=args.tiktok_height,
+        )
+        time_second["hook_image_gen"] = [time.time() - t0]
+        print(f"[TT] Hook image: {time_second['hook_image_gen'][0]:.1f}s")
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # STAGE 2: TTS + Audio Pacing + B-Roll Generation
+    # ═══════════════════════════════════════════════════════════════════════
     if "2" in stage or "0" in stage:
-        prompt_path = "./src/prompts/slide_subtitle_cursor_prompt.txt"
-        subtitle, usage_subtitle = subtitle_cursor_gen(slide_image_dir, prompt_path, agent_config_v)
-        with open(subtitle_cursor_save_path, 'w') as f:
-            f.write(subtitle)
-
-        if args.model_name_v not in token_usage:
-            token_usage[args.model_name_v] = [usage_subtitle]
-        else:
-            token_usage[args.model_name_v].append(usage_subtitle)
-        step2_time = time.time()
-        time_second["subtitle_cursor_prompt_gen"] = [step2_time - start_time]
-        print("Subtitle and Cursor Prompt Generation", step2_time - start_time)
-
-        # ── Step 3-1: Speech Generation ──────────────────────────────────────
+        # ── 2a: Text-to-Speech ───────────────────────────────────────────
+        t0 = time.time()
         tts_per_slide(
             model_type='f5',
-            script_path=subtitle_cursor_save_path,
+            script_path=tts_script_path,
             speech_save_dir=speech_save_dir,
             ref_audio=args.ref_audio,
             ref_text=args.ref_text,
         )
-        step3_1_time = time.time()
-        time_second["tts"] = [step3_1_time - step2_time]
-        print("Speech Generation", step3_1_time - step2_time)
+        time_second["tts"] = [time.time() - t0]
+        print(f"[TT] TTS: {time_second['tts'][0]:.1f}s")
 
-        # ── Step 3-2: Cursor Generation ───────────────────────────────────────
-        os.environ["PYTHONHASHSEED"] = "random"
-        cursor_token = cursor_gen_per_sentence(
-            script_path=subtitle_cursor_save_path,
-            slide_img_dir=slide_image_dir,
-            slide_audio_dir=speech_save_dir,
-            cursor_save_path=cursor_save_path,
-            gpu_list=args.gpu_list,
-            model_name=args.model_name_v
-        )
-        token_usage["cursor"] = cursor_token
-        step3_2_time = time.time()
-        time_second["cursor_gen"] = [step3_2_time - step3_1_time]
-        print("Cursor Generation", step3_2_time - step3_1_time)
+        # ── 2b: Remove pauses for breathless pacing ─────────────────────
+        t0 = time.time()
+        paced_files = remove_pauses_batch(speech_save_dir, paced_audio_dir)
+        time_second["pacing"] = [time.time() - t0]
+        print(f"[TT] Silence removal: {time_second['pacing'][0]:.1f}s")
 
-    # ── Step 4: Merge + TikTok Reformat ──────────────────────────────────────
-    start_time = time.time()
+    # ═══════════════════════════════════════════════════════════════════════
+    # STAGE 3: Visual Assembly + Audio Mix + Final Output
+    # ═══════════════════════════════════════════════════════════════════════
     if "3" in stage or "0" in stage:
-        tmp_merge_dir = path.join(args.result_dir, "merge")
-        tmp_merge_1   = path.join(args.result_dir, "1_merge.mp4")
-        tmp_merge_2   = path.join(args.result_dir, "2_merge.mp4")
-        tmp_merge_3   = path.join(args.result_dir, "3_merge.mp4")
-        tiktok_out    = path.join(args.result_dir, "tiktok_final.mp4")
+        t0 = time.time()
 
-        image_size = cv2.imread(path.join(slide_image_dir, '1.png')).shape
-        size       = max(image_size[0] // 6, image_size[1] // 6)
-        num_slide  = len([f for f in os.listdir(slide_image_dir) if f.endswith('.png')])
-        speaker_id = args.ref_img.split("/")[-1].replace(".png", "")
-        print(f"[Merge] {num_slide} slides, speaker: {speaker_id}")
+        # Load segments
+        with open(script_save_path) as f:
+            script_data = json.load(f)
+        segments = script_data["segments"]
 
-        merge_cmd = [
-            "./src/1_merage_light.bash",
-            slide_image_dir, speech_save_dir, tmp_merge_dir,
-            str(num_slide), tmp_merge_1, speaker_id,
-        ]
-        subprocess.run(merge_cmd, text=True, check=True)
-
-        # Render cursor overlay
-        cursor_size = size // 6
-        render_video_with_cursor_from_json(
-            video_path=tmp_merge_1,
-            out_video_path=tmp_merge_2,
-            json_path=cursor_save_path,
-            cursor_img_path=cursor_img_path,
-            transition_duration=0.1,
-            cursor_size=cursor_size,
+        # Collect paced audio files
+        paced_files = sorted(
+            [path.join(paced_audio_dir, f) for f in os.listdir(paced_audio_dir)
+             if f.endswith(('.wav', '.mp3'))],
+            key=lambda x: int(re.search(r'\d+', path.basename(x)).group())
         )
 
-        # Render subtitles — larger font for vertical mobile viewing
-        # TikTok subtitle font size: scale relative to tiktok_width
-        tt_font_size = args.tiktok_width // 22   # ~49px at 1080p
-        add_subtitles(tmp_merge_2, tmp_merge_3, tt_font_size)
+        # ── 3a: Calculate per-segment durations from audio ───────────────
+        # Count segments per slide
+        slide_seg_counts = {}
+        for seg in segments:
+            key = seg["slide_idx"] if seg["slide_idx"] is not None else -1
+            slide_seg_counts[key] = slide_seg_counts.get(key, 0) + 1
 
-        # ── TikTok format: vertical + trim ────────────────────────────────────
-        tiktok_reformat(
-            input_video=tmp_merge_3,
-            output_video=tiktok_out,
-            width=args.tiktok_width,
-            height=args.tiktok_height,
-            max_duration=args.max_duration,
-            max_speedup=args.max_speedup,
+        # Map slide indices to audio file indices
+        slide_keys = []
+        for seg in segments:
+            key = seg["slide_idx"] if seg["slide_idx"] is not None else (slide_keys[-1] if slide_keys else 0)
+            if key not in slide_keys:
+                slide_keys.append(key)
+
+        segments_per_slide = [slide_seg_counts.get(k, slide_seg_counts.get(-1, 1)) for k in slide_keys]
+        audio_durations = get_segment_durations(paced_files, segments_per_slide)
+
+        # Pad if needed
+        while len(audio_durations) < len(segments):
+            audio_durations.append(3.0)
+
+        print(f"[TT] Segment durations: {[f'{d:.1f}s' for d in audio_durations]}")
+
+        # ── 3b: Assemble visual timeline ─────────────────────────────────
+        os.makedirs(visual_work_dir, exist_ok=True)
+        visual_video = assemble_visual_timeline(
+            segments=segments,
+            slide_image_dir=slide_image_dir,
+            audio_durations=audio_durations,
+            work_dir=visual_work_dir,
+            hook_image_path=hook_image_path if path.exists(hook_image_path) else None,
+            styles=styles,
+        )
+        print(f"[TT] Visual assembly complete: {visual_video}")
+
+        # ── 3c: Concatenate and mix audio ────────────────────────────────
+        vo_concat = path.join(args.result_dir, "vo_concat.wav")
+        concatenate_audio(paced_files, vo_concat)
+
+        mixed_audio = path.join(args.result_dir, "mixed_audio.m4a")
+        if args.music_path and path.exists(args.music_path):
+            mix_with_music(
+                vo_path=vo_concat,
+                music_path=args.music_path,
+                output_path=mixed_audio,
+                music_vol_normal=styles["audio"]["music_volume_normal"],
+                music_vol_ducked=styles["audio"]["music_volume_ducked"],
+            )
+            print(f"[TT] Audio mixed with music: {args.music_path}")
+        else:
+            mix_without_music(vo_concat, mixed_audio)
+            if args.music_path:
+                print(f"[TT] Warning: music file not found: {args.music_path}, using VO only")
+            else:
+                print("[TT] No music file specified, using VO only")
+
+        # ── 3d: Final mux — video + audio with fade-out ─────────────────
+        muxed_video = path.join(args.result_dir, "muxed.mp4")
+        mux_video_audio(
+            video_path=visual_video,
+            audio_path=mixed_audio,
+            output_path=muxed_video,
+            fade_out_duration=styles["transitions"]["fade_out_duration"],
         )
 
-        step4_time = time.time()
-        time_second["merge_and_tiktok"] = [step4_time - start_time]
-        print("Merge + TikTok Reformat", step4_time - start_time)
-        print(f"\n[Done] TikTok video: {tiktok_out}")
+        # ── 3e: Render karaoke-style subtitles ──────────────────────────
+        tt_font_size = args.tiktok_width // 18  # ~60px at 1080p
+        add_subtitles(muxed_video, tiktok_out, tt_font_size)
 
-    # ── Save timing + token logs ──────────────────────────────────────────────
-    with open(path.join(args.result_dir, "sat.json"),   'w') as f: json.dump(time_second,  f, indent=4)
-    with open(path.join(args.result_dir, "token.json"), 'w') as f: json.dump(token_usage,  f, indent=4)
+        time_second["visual_and_mux"] = [time.time() - t0]
+        print(f"[TT] Visual + audio + mux + subtitles: {time_second['visual_and_mux'][0]:.1f}s")
+        print(f"\n{'='*60}")
+        print(f"[DONE] TikTok video: {tiktok_out}")
+        print(f"{'='*60}")
+
+    # ── Save timing + token logs ──────────────────────────────────────────
+    with open(sat_path, 'w') as f:
+        json.dump(time_second, f, indent=4)
+    with open(tok_path, 'w') as f:
+        json.dump(token_usage, f, indent=4)

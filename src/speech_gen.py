@@ -5,6 +5,9 @@ import cv2
 import json
 import torch
 
+# Allow MPS to use all available memory instead of capping at ~75%
+os.environ.setdefault("PYTORCH_MPS_HIGH_WATERMARK_RATIO", "0.0")
+
 # PyTorch 2.6+ changed weights_only default to True; patch torch.load so
 # whisperx/pyannote checkpoints (which use omegaconf globals) still load.
 _orig_torch_load = torch.load
@@ -34,12 +37,17 @@ def transcribe_with_whisperx(audio_path, lang="en", device="cuda" if torch.cuda.
 _F5_INSTANCE = None
 
 
-def _free_memory():
+def _free_memory(force_unload=False):
     """Release unused tensors from the MPS / CUDA cache between slides."""
+    global _F5_INSTANCE
+    if force_unload and _F5_INSTANCE is not None:
+        del _F5_INSTANCE
+        _F5_INSTANCE = None
     gc.collect()
     if torch.backends.mps.is_available():
         try:
             torch.mps.empty_cache()
+            torch.mps.synchronize()
         except Exception:
             pass
     if torch.cuda.is_available():
