@@ -221,37 +221,6 @@ python pipeline_tt.py --stage '["3"]' ...
 | `--tiktok_height` | `int` | `3840` | Output video height |
 | `--stage` | `str` | `'["0"]'` | Stages: `0`=all, `1`=slides+script, `2`=TTS, `3`=visual+audio+final |
 
-### Pipeline Architecture
-
-```
-Paper LaTeX ──> [Vertical Slide Gen] ──> Slide Images (9:16, 4K)
-                                              │
-                                              ▼
-                                    [Hook-First Script Gen] ──> Segments
-                                              │                (hook/narrative/flex)
-                                              ▼
-                                      [Jargon Filter]
-                                              │
-                              ┌───────────────┴───────────────┐
-                              ▼                               ▼
-                        [TTS + Pace]                  [Static Slide Assembly]
-                              │                       + AI Hook Image
-                              ▼                               │
-                     VO (no pauses)                           │
-                              │                               │
-                              ▼                               │
-                     [Music + Ducking]                        │
-                              │                               │
-                              └────────────┬──────────────────┘
-                                           ▼
-                                  [Final Mux + Subtitles]
-                                  + Karaoke highlighting
-                                  + Fade-out
-                                           │
-                                           ▼
-                                   tiktok_final.mp4
-```
-
 ### Module Reference
 
 | File | Purpose |
